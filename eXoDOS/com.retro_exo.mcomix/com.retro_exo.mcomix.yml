@@ -1,0 +1,182 @@
+app-id: com.retro_exo.mcomix
+runtime: org.freedesktop.Platform
+runtime-version: '25.08'
+sdk: org.freedesktop.Sdk
+sdk-extensions:
+  - org.freedesktop.Sdk.Extension.llvm21
+command: mcomix
+cleanup:
+  - /share/applications
+  - /share/icons
+  - /share/metainfo
+  - /share/appdata
+finish-args:
+  - --share=ipc
+  - --socket=fallback-x11
+  - --socket=wayland
+  - --socket=pulseaudio
+  - --device=dri
+  - --env=TMPDIR=/var/tmp
+  # need, for own file chooser
+  - --filesystem=xdg-documents
+  - --filesystem=xdg-download
+  - --filesystem=xdg-pictures
+  - --filesystem=xdg-desktop
+  - --filesystem=/media
+  - --filesystem=/run/media
+  - --filesystem=host
+
+modules:
+  - name: 7-zip
+    buildsystem: simple
+    build-commands:
+      - |
+        for bundle in Alone2 SFXCon; do
+          pushd CPP/7zip/Bundles/${bundle}
+          make -j ${FLATPAK_BUILDER_N_JOBS} -f ../../cmpl_gcc.mak
+          popd
+        done
+      - install -Dm755 CPP/7zip/Bundles/Alone2/b/g/7zz   $FLATPAK_DEST/bin/7z
+      - install -Dm755 CPP/7zip/Bundles/SFXCon/b/g/7zCon $FLATPAK_DEST/bin/7zCon.sfx
+    sources:
+      - type: git
+        url: https://github.com/ip7z/7zip.git
+        tag: '26.00'
+        commit: 839151eaaad24771892afaae6bac690e31e58384
+        x-checker-data:
+          type: git
+          tag-pattern: ^([\d.]+)$
+
+  - name: unrar
+    no-autogen: true
+    build-options:
+      strip: true
+    make-install-args:
+      - DESTDIR=$(FLATPAK_DEST)
+    sources:
+      - type: archive
+        url: https://www.rarlab.com/rar/unrarsrc-5.8.3.tar.gz
+        sha256: 3591685c8f5bbcb0be09de3d0a0544adb88966b9cccb80986f6cd2b534fd91a6
+
+  - name: mcomix
+    buildsystem: simple
+    build-commands:
+      - pip3 install --verbose --exists-action=i --no-index --prefix=${FLATPAK_DEST}
+        --no-build-isolation .[fileformats]
+      - cp -a share -t /app/
+      - |
+        resize=$PWD/resize.py
+        cd $FLATPAK_DEST/share/icons/hicolor
+        for x in $(ls);do
+          [ -e ${x}/apps/mcomix.png ] || continue
+          size=${x%x*}
+          python ${resize} -s ${size} ${x}/apps/mcomix.png
+          echo ${size}_ok
+        done
+        rm */apps/*.svg
+    sources:
+      - type: archive
+        url: https://downloads.sourceforge.net/project/mcomix/MComix-3.1.1/mcomix-3.1.1.tar.gz
+        sha256: a10aaaed7bc07deb74efde93bf9a8a27e1bcbf1824a0519b264cfee582becef8
+        x-checker-data:
+          type: anitya
+          project-id: 8886
+          stable-only: true
+          url-template: https://downloads.sourceforge.net/project/mcomix/MComix-$version/mcomix-$version.tar.gz
+
+      - type: shell
+        commands:
+          - sed -i "s:constants.APPNAME:'${FLATPAK_ID}':g" ./mcomix/run.py
+
+      - type: script
+        dest-filename: resize.py
+        commands:
+          - |
+            from PIL import Image
+            from pathlib import Path
+            import argparse
+
+            parser = argparse.ArgumentParser()
+            parser.add_argument("-s", type=str,metavar='size',required=True)
+            parser.add_argument("path", type=str)
+
+            args = vars(parser.parse_args())
+            size: int = int(args['s'])
+            path: Path = Path(args['path'])
+
+            fin_img = Image.new('RGBA', (size, size), (0, 0, 0, 0))
+            img = Image.open(path)
+            in_w,in_h = img.size
+            rate = in_w / in_h
+            w = int(size if rate > 1 else size*rate)
+            h = int(size if rate <= 1 else size/rate)
+            img = img.resize((w,h), Image.Resampling.LANCZOS)
+            fin_img.paste(img, (int((size-w)/2), int((size-h)/2)))
+            fin_img.save(path)
+
+    modules:
+      - pymupdf.yml
+      - buildbackend.yml
+      - name: python3-pygobject
+        buildsystem: simple
+        build-commands:
+          - pip3 install --verbose --exists-action=i --no-index --find-links="file://${PWD}"
+            --prefix=${FLATPAK_DEST} "pycairo" --no-build-isolation
+          - pip3 install --verbose --exists-action=i --no-index --find-links="file://${PWD}"
+            --prefix=${FLATPAK_DEST} "pygobject" --no-build-isolation
+        sources:
+          - type: file
+            url: https://files.pythonhosted.org/packages/22/d9/1728840a22a4ef8a8f479b9156aa2943cd98c3907accd3849fb0d5f82bfd/pycairo-1.29.0.tar.gz
+            sha256: f3f7fde97325cae80224c09f12564ef58d0d0f655da0e3b040f5807bd5bd3142
+            x-checker-data:
+              name: pycairo
+              type: pypi
+          - type: file
+            url: https://files.pythonhosted.org/packages/d3/a5/68f883df1d8442e3b267cb92105a4b2f0de819bd64ac9981c2d680d3f49f/pygobject-3.54.5.tar.gz
+            sha256: b6656f6348f5245606cf15ea48c384c7f05156c75ead206c1b246c80a22fb585
+            x-checker-data:
+              name: pygobject
+              type: pypi
+
+      - name: python3-pybind11
+        buildsystem: simple
+        build-commands:
+          - pip3 install --verbose --exists-action=i --no-index --find-links="file://${PWD}"
+            --prefix=${FLATPAK_DEST} "pybind11<=4.0" --no-build-isolation
+        cleanup:
+          - '*'
+        sources:
+          - type: file
+            url: https://files.pythonhosted.org/packages/88/c5/e98d9c51f3d5300d5e40ad9037dd6b3b60736fd02ab68dcc98c96be7592d/pybind11-3.0.2-py3-none-any.whl
+            sha256: f8a6500548919cc33bcd220d5f984688326f574fa97f1107f2f4fdb4c6fb019f
+            x-checker-data:
+              type: pypi
+              name: pybind11
+              packagetype: bdist_wheel
+
+      - name: python3-Pillow
+        buildsystem: simple
+        build-commands:
+          - pip3 install --verbose --exists-action=i --no-index --find-links="file://${PWD}"
+            --prefix=${FLATPAK_DEST} "Pillow>=6.0.0" --no-build-isolation
+        sources:
+          - type: file
+            url: https://files.pythonhosted.org/packages/1f/42/5c74462b4fd957fcd7b13b04fb3205ff8349236ea74c7c375766d6c82288/pillow-12.1.1.tar.gz
+            sha256: 9ad8fa5937ab05218e2b6a4cff30295ad35afd2f83ac592e68c0d871bb0fdbc4
+            x-checker-data:
+              type: pypi
+              name: Pillow
+
+      - name: python3-chardet
+        buildsystem: simple
+        build-commands:
+          - pip3 install --verbose --exists-action=i --no-index --find-links="file://${PWD}"
+            --prefix=${FLATPAK_DEST} "chardet>=5.0.0" --no-build-isolation
+        sources:
+          - type: file
+            url: https://files.pythonhosted.org/packages/f3/0d/f7b6ab21ec75897ed80c17d79b15951a719226b9fababf1e40ea74d69079/chardet-5.2.0.tar.gz
+            sha256: 1b3b6ff479a8c414bc3fa2c0852995695c4a026dcd6d0633b2dd092ca39c1cf7
+            x-checker-data:
+              type: pypi
+              name: chardet
+

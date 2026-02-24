@@ -1,0 +1,68 @@
+app-id: com.retro_exo.dosbox-ece-r4301
+runtime: org.freedesktop.Platform
+runtime-version: '25.08'
+sdk: org.freedesktop.Sdk
+command: dosbox
+
+build-options:
+  cflags: "-O2 -U_FORTIFY_SOURCE -D_FORTIFY_SOURCE=2"
+  cxxflags: "-O2 -U_FORTIFY_SOURCE -D_FORTIFY_SOURCE=2"
+
+finish-args:         # flatpak permissions
+  - --device=all     # needed for OpenGL, gamepads and serial/parallel
+  - --share=ipc      # needed for X11
+  - --share=network  # Needed for IPX and serial over TCP/IP
+  - --socket=x11     # default to X11, as Gnome does not provide SSD
+  - --socket=pulseaudio
+  - --filesystem=host
+  - --filesystem=xdg-run/pipewire-0:ro
+cleanup:
+  - '/include'
+  - '/lib/pkgconfig'
+  - '/share/aclocal'
+  - '/share/man'
+  - '*.la'
+  - '*.a'
+  - '/share/doc'
+
+modules:
+  - "shared-modules/glu/glu-9.json"
+  - "shared-modules/glew/glew.json"  
+  - "shared-modules/SDL/SDL-1.2.15.json"
+  - "shared-modules/SDL/SDL_net-1.2.8.json"
+  - "shared-modules/linux-audio/fluidsynth2.json"
+  - name: open-glide
+    buildsystem: autotools
+    sources:
+      - type: git
+        url: https://github.com/voyageur/openglide.git
+        commit: 1ecc60a83d2255bb9ce8a3e53a5c6bcc7dce44b1   
+  - name: mt32emu
+    buildsystem: cmake-ninja
+    config-opts:
+      - -Dmunt_WITH_MT32EMU_SMF2WAV=FALSE
+      - -Dmunt_WITH_MT32EMU_QT=FALSE
+      - -Dlibmt32emu_WITH_VERSION_TAGGING=TRUE
+      - -Dlibmt32emu_WITH_SYMBOL_VERSIONING=TRUE
+    sources:
+      - type: archive
+        url: https://github.com/munt/munt/archive/refs/tags/libmt32emu_2_7_3.tar.gz
+        sha256: e51f3475771c9d07116e6cb5ae2e095ef3b11b3107d92c01d3a1dc03be13ff98
+        x-checker-data:
+          type: anitya
+          project-id: 220368
+          url-template: https://github.com/munt/munt/archive/libmt32emu_$version.tar.gz
+  - name: dosbox-ece-r4301
+    buildsystem: simple
+    build-commands:
+      - ./autogen.sh
+      - ./configure --prefix=/app --disable-debug --disable-silent-rules --disable-dependency-tracking --enable-alsa-midi --enable-screenshots  --enable-recording --enable-opengl
+      - make CXXFLAGS="-I /app/include/openglide -I ./include -O2 -U_FORTIFY_SOURCE -D_FORTIFY_SOURCE=2"
+      - make install
+    build-options:
+      build-args:
+        - --share=network
+    sources:
+      - type: archive
+        url: https://github.com/jonesaaronj/exo_flatpaks/releases/download/source_bundles/ece-r4301-source.tar.gz
+        sha256: 234e1dabe4be23a38af2f7909d57ad48072005992779559f5638fad9e4cc5787

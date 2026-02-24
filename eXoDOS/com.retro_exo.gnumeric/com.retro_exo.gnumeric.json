@@ -1,0 +1,193 @@
+{
+    "id": "com.retro_exo.gnumeric",
+    "runtime": "org.gnome.Platform",
+    "runtime-version": "49",
+    "sdk": "org.gnome.Sdk",
+    "command": "gnumeric",
+    "appstream-compose": false,
+    "finish-args": [
+        "--share=ipc",
+        "--socket=fallback-x11",
+        "--socket=wayland",
+        "--filesystem=host",
+        "--share=network",
+        "--talk-name=org.gtk.vfs.*",
+        "--filesystem=xdg-run/gvfs",
+        "--filesystem=xdg-run/gvfsd"
+    ],
+    "cleanup": [
+        "/lib/pkgconfig",
+        "/share/man",
+        "*.la",
+        "*.a",
+        "/share/applications",
+        "/share/icons",
+        "/share/metainfo",
+        "/share/appdata"
+    ],
+    "modules": [
+        "shared-modules/intltool/intltool-0.51.json",
+        {
+            "name": "gsf",
+            "config-opts": [
+                "--disable-static"
+            ],
+            "cleanup": [
+                "/include",
+                "/lib/pkgconfig",
+                "/share/man",
+                "/share/gtk-doc/html/gsf",
+                "/share/thumbnailers",
+                "/bin/gsf*",
+                "*.la"
+            ],
+            "sources": [
+                {
+                    "type": "archive",
+                    "url": "https://download.gnome.org/sources/libgsf/1.14/libgsf-1.14.55.tar.xz",
+                    "sha256": "74d60abba15bd3ea5ad17da5b924d8e36f649a25c3dc77adbabd2a3628a02131",
+                    "x-checker-data": {
+                        "type": "gnome",
+                        "name": "libgsf",
+                        "versions": {
+                            "<": "1.15"
+                        },
+                        "stable-only": true
+                    }
+                }
+            ]
+        },
+        {
+            "name": "goffice",
+            "config-opts": [
+                "--disable-static"
+            ],
+            "cleanup": [
+                "/include",
+                "/share/gtk-doc",
+                "/lib/pkgconfig",
+                "*.la"
+            ],
+            "sources": [
+                {
+                    "type": "archive",
+                    "url": "https://download.gnome.org/sources/goffice/0.10/goffice-0.10.60.tar.xz",
+                    "sha256": "01154338cbffac172fc53338ebb9d527c821ffc21985a2ccfa84923ee6b761c5",
+                    "x-checker-data": {
+                        "type": "gnome",
+                        "name": "goffice",
+                        "versions": {
+                            "<": "0.11"
+                        },
+                        "stable-only": true
+                    }
+                }
+            ]
+        },
+        {
+            "name": "ed",
+            "cleanup": [
+                "*"
+            ],
+            "sources": [
+                {
+                    "type": "archive",
+                    "url": "https://mirrors.ibiblio.org/gnu/ed/ed-1.22.tar.lz",
+                    "sha256": "7eb22c30a99dcdb50a8630ef7ff3e4642491ac4f8cd1aa9f3182264df4f4ad08"
+                }
+            ]
+        },
+        {
+            "name": "bc",
+            "cleanup": [
+                "*"
+            ],
+            "sources": [
+                {
+                    "type": "archive",
+                    "url": "https://ftp.gnu.org/gnu/bc/bc-1.07.1.tar.gz",
+                    "sha256": "62adfca89b0a1c0164c2cdca59ca210c1d44c3ffc46daf9931cf4942664cb02a"
+                }
+            ]
+        },
+        {
+            "name": "psiconv",
+            "config-opts": [
+                "--disable-static"
+            ],
+            "cleanup": [
+                "/include",
+                "/share/man",
+                "/share/psiconv",
+                "/bin/psiconv*",
+                "*.la"
+            ],
+            "build-options": {
+                "cflags": "-fcommon"
+            },
+            "sources": [
+                {
+                    "type": "archive",
+                    "url": "http://www.frodo.looijaard.name/system/files/software/psiconv/psiconv-0.9.9.tar.gz",
+                    "mirror-urls": [
+                        "https://github.com/jonesaaronj/exo_flatpaks/releases/download/source_bundles/psiconv-0.9.9.tar.gz"
+                    ],
+                    "sha256": "6d51fe79b502a1e277bea275a574ae2db5b1b9d7daef703a8fa3635ae02a8bb0"
+                },
+                {
+                    "type": "patch",
+                    "path": "patches/psiconv-fixes.patch"
+                },
+                {
+                    "type": "shell",
+                    "commands": [
+                        "autoreconf -vfi"
+                    ]
+                }
+            ]
+        },
+        {
+            "name": "pxlib",
+            "build-options": {
+                "cflags": "-fpermissive"
+            },
+            "config-opts": [
+                "--disable-static"
+            ],
+            "cleanup": [
+                "/include",
+                "*.la"
+            ],
+            "sources": [
+                {
+                    "type": "archive",
+                    "url": "https://download.sourceforge.net/project/pxlib/pxlib/0.6.8/pxlib-0.6.8.tar.gz",
+                    "sha256": "5f9b58a5c3d9e5e60faad16dfbc5172ee14ae57a978732378660c0f2c9e74ef9"
+                }
+            ]
+        },
+        {
+            "name": "gnumeric",
+            "buildsystem": "autotools",
+            "cleanup": [
+                "/include"
+            ],
+            "sources": [
+                {
+                    "type": "archive",
+                    "url": "https://download.gnome.org/sources/gnumeric/1.12/gnumeric-1.12.60.tar.xz",
+                    "sha256": "bb02feb286062805564438534e1fea459f97cebac8a090b1a7e47ca251e07467",
+                    "x-checker-data": {
+                        "type": "gnome",
+                        "name": "gnumeric",
+                        "stable-only": true
+                    }
+                },
+                {
+                    "type": "patch",
+                    "path": "patches/gnumerica-appstream.patch"
+                }
+            ]
+        }
+    ]
+}

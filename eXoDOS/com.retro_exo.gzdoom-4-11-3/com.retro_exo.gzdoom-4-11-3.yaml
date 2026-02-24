@@ -1,0 +1,108 @@
+app-id: com.retro_exo.gzdoom-4-11-3
+runtime: org.freedesktop.Platform
+sdk: org.freedesktop.Sdk
+runtime-version: "25.08"
+command: gzdoom.sh
+
+finish-args:
+  - --device=dri
+  - --socket=wayland
+  - --socket=fallback-x11
+  - --share=ipc
+  - --share=network
+  - --socket=pulseaudio
+  - --filesystem=host
+
+  # Based on GZDoom
+  # We redirect the original ~/.config/gzdoom
+  - --env=DOOMWADDIR=/app/share/games/doom
+  - --persist=.config/gzdoom
+  
+  # Controller support on SteamDeck and such
+  - --device=all
+
+  # Simpler way of preventing KDE related errors
+  - --env=KDE_FULL_SESSION=false
+
+cleanup:
+  - /app/include
+  - /app/lib/*.a
+  - /app/lib/*.la
+  - /app/lib/pkgconfig
+
+modules:
+
+  - name: gzdoom
+    buildsystem: cmake-ninja
+    build-options:
+      cflags: -std=gnu17 -Wno-error=incompatible-pointer-types
+    config-opts:
+      - -DCMAKE_BUILD_TYPE=RelWithDebInfo
+    cleanup:
+      - /lib/*.a
+      - /lib/*.la
+      - /lib/pkgconfig
+      - /include
+    sources:
+      - type: git
+        url: https://github.com/zdoom/gzdoom.git
+        tag: g4.11.3
+        commit: 6ce809efe2902e43ceaa7031b875225d3a0367de
+        x-checker-data:
+          type: anitya
+          project-id: 17531
+          stable-only: true
+          tag-template: g$version
+      - type: patch
+        path: description.patch
+    modules:
+      - shared-modules/linux-audio/libinstpatch.json
+      - shared-modules/linux-audio/fluidsynth2.json
+      - name: libsndfile
+        buildsystem: cmake-ninja
+        sources:
+          - type: git
+            url: https://github.com/libsndfile/libsndfile.git
+            commit: 68f6c16fe1407eff4cdde158566694c3ed666c2f
+            x-checker-data:
+              type: anitya
+              project-id: 13277
+              stable-only: true
+              url-template: https://github.com/libsndfile/libsndfile/releases/download/$version/libsndfile-$version.tar.xz
+      - name: game-music-emu
+        buildsystem: cmake-ninja
+        config-opts:
+          - -DCMAKE_BUILD_TYPE=RelWithDebInfo
+          - -DCMAKE_POLICY_VERSION_MINIMUM=3.5
+        sources:
+          - type: archive
+            url: https://bitbucket.org/mpyne/game-music-emu/downloads/game-music-emu-0.6.3.tar.gz
+            sha256: 626e8a104e0dadd10ef6519a67aca880c7b40f81471659f1935b61754e12fc7b
+            x-checker-data:
+              type: anitya
+              project-id: 866
+              stable-only: true
+              url-template: https://bitbucket.org/mpyne/game-music-emu/downloads/game-music-emu-$version.tar.gz
+      - name: zmusic
+        buildsystem: cmake-ninja
+        config-opts:
+          - -DCMAKE_BUILD_TYPE=RelWithDebInfo
+        sources:
+          - type: archive
+            url: https://github.com/ZDoom/ZMusic/archive/refs/tags/1.3.0.tar.gz
+            sha256: 2eccd41e1cc9b38b3729ab94d65635719b2adc916de4ca9f8399ebceaee89f7f
+            x-checker-data:
+              type: anitya
+              project-id: 153600
+              stable-only: true
+              url-template: https://github.com/zdoom/ZMusic/archive/$version.tar.gz
+
+  - name: launcher
+    buildsystem: simple
+    sources:
+      - type: script
+        commands:
+          - exec gzdoom +fluid_patchset /app/share/games/doom/soundfonts/gzdoom.sf2 "$@"
+        dest-filename: gzdoom.sh
+    build-commands:
+      - install -D gzdoom.sh /app/bin/gzdoom.sh

@@ -1,0 +1,67 @@
+{
+    "app-id": "com.retro_exo.dosbox-gridc-4-3-1",
+    "runtime": "org.freedesktop.Platform",
+    "runtime-version": "25.08",
+    "sdk": "org.freedesktop.Sdk",
+    "build-options": {
+        "cflags": "-O2 -U_FORTIFY_SOURCE -D_FORTIFY_SOURCE=2",
+        "cxxflags": "-O2 -U_FORTIFY_SOURCE -D_FORTIFY_SOURCE=2"
+    },
+    "finish-args": [
+        "--device=all",
+        "--share=ipc",
+        "--share=network",
+        "--socket=x11",
+        "--socket=pulseaudio",
+        /* DOSBox does not respect XDG base directories */
+        "--persist=.dosbox",
+        "--filesystem=host"
+    ],
+    "command": "dosbox",
+    "cleanup": [
+        "/include",
+        "/lib/pkgconfig",
+        "/share/aclocal",
+        "/share/man",
+        "*.la", "*.a"
+    ],
+    "modules": [
+        "shared-modules/glu/glu-9.json",
+        "shared-modules/SDL/SDL-1.2.15.json",
+        "shared-modules/SDL/SDL_net-1.2.8.json",
+        {
+            "name": "SDL_sound",
+            "rm-configure": true,
+            "config-opts": ["--disable-static"],
+            "sources": [
+                {
+                    "type": "archive",
+                    "url": "https://icculus.org/SDL_sound/downloads/SDL_sound-1.0.3.tar.gz",
+                    "sha256": "3999fd0bbb485289a52be14b2f68b571cb84e380cc43387eadf778f64c79e6df"
+                },
+                {
+                    "type": "script",
+                    "commands": [ "AUTOMAKE=\"automake --foreign\" autoreconf -fiv" ],
+                    "dest-filename": "autogen.sh"
+                }
+            ]
+        },
+        {
+            "name": "dosbox",
+            "sources": [
+                {
+                    "type": "archive",
+                    "url": "https://github.com/hiddenasbestos/dosbox-gridc/archive/refs/tags/GC-v4.3.1.tar.gz",
+                    "sha256": "32c6e9b1d70ddb8f468fa948a081fd63e0793dd41b7fbc95492f70c249aa86a6"
+                },
+                {
+                    "type": "script",
+                    "commands": [
+                        "autoreconf -fiv"
+                    ],
+                    "dest-filename": "autogen.sh"
+                }
+            ]
+        }
+    ]
+}

@@ -1,0 +1,21 @@
+app-id: com.retro_exo.zenity
+runtime: org.gnome.Platform
+runtime-version: '49'
+sdk: org.gnome.Sdk
+command: zenity
+finish-args:
+  - --share=ipc
+  - --socket=fallback-x11
+  - --socket=wayland
+  - --filesystem=host
+  - --env=GTK_THEME=Adwaita:dark
+
+modules:
+  - name: zenity
+    buildsystem: meson
+    config-opts:
+      - -Dmanpage=false
+    sources:
+      - type: archive
+        url: https://download.gnome.org/sources/zenity/4.2/zenity-4.2.1.tar.xz
+        sha256: 5a9fd8d8316f90cb2e1a5a8f0d411eb9fcaf85957a8229ea3e803e81004a1ebd
