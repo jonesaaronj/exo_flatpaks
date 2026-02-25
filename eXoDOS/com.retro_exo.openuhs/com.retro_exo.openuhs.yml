@@ -1,0 +1,39 @@
+app-id: com.retro_exo.openuhs
+runtime: org.freedesktop.Platform
+runtime-version: '25.08'
+sdk: org.freedesktop.Sdk
+sdk-extensions:
+  - org.freedesktop.Sdk.Extension.openjdk25
+command: openuhs-wrapper
+modules:
+  - name: openjdk
+    buildsystem: simple
+    build-commands:
+      - /usr/lib/sdk/openjdk25/install.sh /app/jre
+  - name: openuhs
+    buildsystem: simple
+    build-commands:
+      - mkdir -p /app/share/openuhs
+      - cp -r * /app/share/openuhs/
+      - install -Dm755 openuhs-wrapper.sh /app/bin/openuhs-wrapper
+    sources:
+      - type: archive
+        url: https://downloads.sourceforge.net/project/openuhs/openuhs/0.6.6/OpenUHS_0.6.6.tar.gz
+        sha256: 8317cf18fe4458b3689359de2d494f3e146e5b974db17a503fc6cadc7ba9621f
+      - type: script
+        dest-filename: openuhs-wrapper.sh
+        commands:
+          - |
+            export JAVA_HOME=/app/jre
+            export PATH=$JAVA_HOME/bin:$PATH
+            cd /app/share/openuhs
+            exec bash ./OpenUHS.command "$@"
+            
+finish-args:
+  - --socket=x11
+  - --socket=wayland
+  - --share=ipc
+  - --share=network
+  - --socket=pulseaudio
+  - --device=dri
+  - --filesystem=host

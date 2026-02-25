@@ -1,0 +1,6 @@
+**/export/
+**/.flatpak-builder
+**/*.flatpak
+**/*.tar.gz
+
+/release

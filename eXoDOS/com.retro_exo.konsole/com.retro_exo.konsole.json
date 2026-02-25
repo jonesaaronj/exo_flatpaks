@@ -1,0 +1,41 @@
+{
+    "id": "com.retro_exo.konsole",
+    "runtime": "org.kde.Platform",
+    "runtime-version": "6.10",
+    "sdk": "org.kde.Sdk",
+    "command": "konsole",
+    "finish-args": [
+        "--device=dri",
+        "--share=ipc",
+        "--share=network",
+        "--socket=wayland",
+        "--socket=fallback-x11",
+        "--talk-name=org.freedesktop.Flatpak"
+    ],
+    "cleanup": [
+        "/share/doc",
+        "/share/qlogging-categories6"
+    ],
+    "modules": [
+        {
+            "name": "konsole",
+            "buildsystem": "cmake-ninja",
+            "config-opts": [
+                "-DINSTALL_ICONS=OFF"
+            ],
+            "sources": [
+                {
+                    "type": "archive",
+                    "url": "https://download.kde.org/stable/release-service/25.12.2/src/konsole-25.12.2.tar.xz",
+                    "sha256": "8220069844051b584c553b7e7da4c3c1ec66f9a79f2f386baa1a9b91436f5046",
+                    "x-checker-data": {
+                        "type": "anitya",
+                        "project-id": 8763,
+                        "stable-only": true,
+                        "url-template": "https://download.kde.org/stable/release-service/$version/src/konsole-$version.tar.xz"
+                    }
+                }
+            ]
+        }
+    ]
+}

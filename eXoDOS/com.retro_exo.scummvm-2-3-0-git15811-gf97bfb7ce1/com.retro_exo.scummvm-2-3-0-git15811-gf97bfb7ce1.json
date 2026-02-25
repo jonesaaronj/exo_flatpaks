@@ -1,0 +1,148 @@
+{
+    "app-id": "com.retro_exo.scummvm-2-3-0-git15811-gf97bfb7ce1",
+    "runtime": "org.freedesktop.Platform",
+    "runtime-version": "25.08",
+    "sdk": "org.freedesktop.Sdk",
+    "finish-args": [
+        "--device=all",
+        "--share=ipc",
+        "--share=network",
+        "--socket=x11",
+        "--socket=wayland",
+        "--socket=pulseaudio",
+        "--filesystem=host",
+        "--filesystem=xdg-documents",
+        "--filesystem=xdg-pictures"
+    ],
+    "command": "scummvm_wrapper",
+    "cleanup": [
+        "/include",
+        "/lib/pkgconfig",
+        "/share/aclocal",
+        "/share/man",
+        "*.la",
+        "*.a",
+        "/share/applications",
+        "/share/icons",
+        "/share/metainfo",
+        "/share/appdata"
+    ],
+    "modules": [
+        "shared-modules/libmad/libmad.json",
+        "shared-modules/glu/glu-9.json",
+        "shared-modules/glew/glew.json",
+        "shared-modules/linux-audio/fluidsynth2.json",
+        {
+            "name": "fluid_soundfont",
+            "sources": [
+                {
+                    "type": "archive",
+                    "url": "http://deb.debian.org/debian/pool/main/f/fluid-soundfont/fluid-soundfont_3.1.orig.tar.gz",
+                    "sha256": "2621acaa1c78e4abdb24bdd163230cc577e61276936d6aa6e3180582142f0343",
+                    "x-checker-data": {
+                        "type": "anitya",
+                        "project-id": 117393,
+                        "url-template": "http://deb.debian.org/debian/pool/main/f/fluid-soundfont/fluid-soundfont_$version.orig.tar.gz"
+                    }
+                }
+            ],
+            "buildsystem": "simple",
+            "build-commands": [
+                "install -Dm644 FluidR3_GM.sf2 /app/share/soundfonts/FluidR3_GM.sf2"
+            ]
+        },
+        {
+            "name": "faad2",
+            "buildsystem": "cmake-ninja",
+            "sources": [
+                {
+                    "type": "archive",
+                    "url": "https://github.com/knik0/faad2/archive/refs/tags/2.11.2.tar.gz",
+                    "sha256": "3fcbd305e4abd34768c62050e18ca0986f7d9c5eca343fb98275418013065c0e",
+                    "x-checker-data": {
+                        "type": "anitya",
+                        "project-id": 13755,
+                        "url-template": "https://github.com/knik0/faad2/archive/$version.tar.gz"
+                    }
+                }
+            ]
+        },
+        {
+            "name": "libmpeg2",
+            "sources": [
+                {
+                    "type": "archive",
+                    "url": "https://download.videolan.org/contrib/libmpeg2/libmpeg2-0.5.1.tar.gz",
+                    "sha256": "dee22e893cb5fc2b2b6ebd60b88478ab8556cb3b93f9a0d7ce8f3b61851871d4",
+                    "x-checker-data": {
+                        "type": "anitya",
+                        "project-id": 21490,
+                        "url-template": "https://libmpeg2.sourceforge.net/files/libmpeg2-$version.tar.gz"
+                    }
+                },
+                {
+                    "type": "shell",
+                    "commands": [
+                        "cp /usr/share/automake-*/config.{guess,sub} .auto/"
+                    ]
+                }
+            ]
+        },
+        {
+            "name": "liba52",
+            "build-options": {
+                "cflags": "-std=gnu17 -Wno-error=incompatible-pointer-types"
+            },
+            "sources": [
+                {
+                    "type": "archive",
+                    "url": "https://download.videolan.org/contrib/a52/a52dec-0.7.4.tar.gz",
+                    "sha256": "a21d724ab3b3933330194353687df82c475b5dfb997513eef4c25de6c865ec33",
+                    "x-checker-data": {
+                        "type": "anitya",
+                        "project-id": 13972,
+                        "url-template": "https://liba52.sourceforge.net/files/a52dec-$version.tar.gz"
+                    }
+                },
+                {
+                    "type": "shell",
+                    "commands": [
+                        "cp /usr/share/automake-*/config.{guess,sub} ./autotools"
+                    ]
+                }
+            ]
+        },
+        {
+            "name": "scummvm_wrapper",
+            "buildsystem": "simple",
+            "sources": [
+                {
+                    "type": "file",
+                    "path": "scummvm_wrapper/scummvm_wrapper.py"
+                }
+            ],
+            "build-commands": [
+                "sed '1i#!/usr/bin/env python3' scummvm_wrapper.py > scummvm_wrapper",
+                "install -Dm755 scummvm_wrapper /app/bin/scummvm_wrapper"
+            ]
+        },
+        {
+            "name": "scummvm",
+            "build-options": {
+                "cxxflags": "-Wno-template-id-cdtor"
+            },
+            "sources": [
+                {
+                    "type": "git",
+                    "url": "https://github.com/scummvm/scummvm.git",
+                    "commit": "f97bfb7ce1"
+                }
+            ],
+            "config-opts": [
+                "--enable-release",
+                "--disable-debug",
+                "--disable-system-dialogs"
+            ]
+        }
+    ]
+}

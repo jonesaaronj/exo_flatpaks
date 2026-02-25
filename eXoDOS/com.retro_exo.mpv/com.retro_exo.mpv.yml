@@ -1,0 +1,1157 @@
+id: com.retro_exo.mpv
+runtime: org.freedesktop.Platform
+runtime-version: '25.08'
+sdk: org.freedesktop.Sdk
+command: mpv
+
+finish-args:
+  - --share=ipc
+  - --socket=x11
+  - --socket=wayland
+  - --device=all
+  - --share=network
+  - --socket=pulseaudio
+  - --filesystem=/tmp:rw
+  - --filesystem=xdg-pictures:rw
+  - --filesystem=xdg-videos:rw
+  - --filesystem=home/.var/app/com.retro_exo.mpv/config/mpv/scripts:create
+  - --filesystem=host:ro
+  - --env=LC_NUMERIC=C
+  - --env=XCURSOR_PATH=/run/host/user-share/icons:/run/host/share/icons
+  - --filesystem=xdg-run/pipewire-0:ro
+
+#  mpris support via dbus
+  - --own-name=org.mpris.MediaPlayer2.mpv.*
+  - --talk-name=org.gnome.SessionManager
+
+cleanup:
+  - '*.la'
+  - '*.a'
+
+modules:
+  - name: lmdb
+    sources:
+      - sha256: f3927859882eb608868c8c31586bb7eb84562a40a6bf5cc3e13b6b564641ea28
+        type: archive
+        url: https://github.com/LMDB/lmdb/archive/LMDB_0.9.22.tar.gz
+    make-install-args:
+      - prefix=/app
+    no-autogen: true
+    subdir: libraries/liblmdb
+
+  - name: parse-yapp
+    buildsystem: simple
+    build-commands:
+      - perl Makefile.PL INSTALL_BASE=/app
+      - make
+      - make install
+    sources:
+      - type: archive
+        url: https://cpan.metacpan.org/authors/id/W/WB/WBRASWELL/Parse-Yapp-1.21.tar.gz
+        sha256: 3810e998308fba2e0f4f26043035032b027ce51ce5c8a52a8b8e340ca65f13e5
+
+  - name: smbclient
+    config-opts:
+      - --without-json
+      - --without-ad-dc
+      - --without-ldap
+      - --without-ads
+      - --without-pam
+      - --disable-python
+      - --disable-cups
+      - --disable-iprint
+      - --without-systemd
+      - --bindir=.
+      - --sbindir=.
+      - --sysconfdir=.
+    cleanup:
+      - /lib/perl5
+    build-options:
+      env:
+        PERL5LIB: /app/lib/perl5
+    buildsystem: autotools
+    sources:
+      - type: archive
+        archive-type: tar
+        url: https://download.samba.org/pub/samba/stable/samba-4.23.4.tar.gz
+        sha256: af429d078a86f1ce16d0d1ecee35c42a3610790b47b84468f31284a8c4060140
+        x-checker-data:
+          type: html
+          url: https://download.samba.org/pub/samba/stable/?C=M;O=D
+          version-pattern: samba-(\d+\.\d+\.\d+).tar.gz
+          url-template: https://download.samba.org/pub/samba/stable/samba-$version.tar.gz
+
+  - name: libXmu
+    buildsystem: autotools
+    sources:
+      - type: git
+        url: https://gitlab.freedesktop.org/xorg/lib/libxmu.git
+        tag: libXmu-1.2.1
+        commit: 792f80402ee06ce69bca3a8f2a84295999c3a170
+        x-checker-data:
+          type: git
+          tag-pattern: ^libXmu-([\d.]+)$
+
+  - name: xclip
+    buildsystem: autotools
+    sources:
+      - type: git
+        url: https://github.com/astrand/xclip.git
+        tag: '0.13'
+        commit: 9aa7090c3b8b437c6489edca32ae43d82e0c1281
+        x-checker-data:
+          type: git
+          tag-pattern: ^(\d+\.\d+)$
+
+  - name: libXpresent
+    buildsystem: autotools
+    sources:
+      - type: git
+        url: https://gitlab.freedesktop.org/xorg/lib/libxpresent.git
+        tag: libXpresent-1.0.2
+        commit: 4d92149372461bf575e8a09b1064a2884c38c3aa
+        x-checker-data:
+          type: git
+          tag-pattern: ^libXpresent-([\d.]+)$
+
+  - name: luajit
+    no-autogen: true
+    cleanup:
+      - /bin
+      - /include
+      - /lib/pkgconfig
+      - /share/man
+    sources:
+      - type: git
+        url: https://github.com/LuaJIT/LuaJIT.git
+        #mirror-urls:
+        #  - https://luajit.org/git/luajit.git
+        disable-shallow-clone: true
+        commit: 7152e15489d2077cd299ee23e3d51a4c599ab14f
+        x-checker-data:
+          type: json
+          url: https://api.github.com/repos/LuaJIT/LuaJIT/branches/v2.1
+          commit-query: .commit.sha
+          version-query: .commit.sha
+          timestamp-query: .commit.commit.committer.date
+      - type: shell
+        commands:
+          - sed -i 's|/usr/local|/app|' ./Makefile
+
+  - name: deno
+    buildsystem: simple
+    build-commands:
+      - install -Dm755 deno /app/bin/deno
+    sources:
+      # -------- x86_64 build --------
+      - type: file
+        only-arches:
+          - x86_64
+        url: https://github.com/denoland/deno/releases/download/v2.5.6/deno-x86_64-unknown-linux-gnu.zip
+        sha256: fd4f6abc1b6a134fa9a4dba56519f1631f44c88e04e4e3e9a8ff5975dfa66e1a
+        dest-filename: deno.zip
+
+      # -------- aarch64 build --------
+      - type: file
+        only-arches:
+          - aarch64
+        url: https://github.com/denoland/deno/releases/download/v2.5.6/deno-aarch64-unknown-linux-gnu.zip
+        sha256: f5e60ae3dfceb61e5e5a41f22129e40a8bc17f6393b59e75d7ca19ceef32d824
+        dest-filename: deno.zip
+
+      # -------- unpack the zip --------
+      - type: shell
+        commands:
+          - unzip deno.zip
+
+  - name: yt-dlp-ejs
+    buildsystem: simple
+    build-commands:
+      - pip3 install --prefix=/app yt_dlp_ejs*.whl
+    sources:
+      - type: file
+        url: https://files.pythonhosted.org/packages/9d/0d/1f0d7a735ca60b87953271b15d00eff5eef05f6118390ddf6f81982526ed/yt_dlp_ejs-0.3.2-py3-none-any.whl
+        sha256: f2dc6b3d1b909af1f13e021621b0af048056fca5fb07c4db6aa9bbb37a4f66a9
+        x-checker-data:
+          type: pypi
+          name: yt-dlp-ejs
+          packagetype: bdist_wheel
+
+  - name: yt-dlp
+    no-autogen: true
+    no-make-install: true
+    make-args:
+      - yt-dlp
+      - PYTHON=/usr/bin/python3
+    post-install:
+      - install yt-dlp /app/bin
+    sources:
+      - type: archive
+        url: https://github.com/yt-dlp/yt-dlp/releases/download/2025.12.08/yt-dlp.tar.gz
+        sha256: 9814ae7dd4118a80a6104399d4984e355d2a71f78e6bbc48137a5b299eddcbaf
+        x-checker-data:
+          type: json
+          url: https://api.github.com/repos/yt-dlp/yt-dlp/releases/latest
+          version-query: .tag_name
+          url-query: .assets[] | select(.name=="yt-dlp.tar.gz") | .browser_download_url
+
+  - name: uchardet
+    buildsystem: cmake-ninja
+    config-opts:
+      - -DCMAKE_BUILD_TYPE=Release
+      - -DBUILD_STATIC=0
+      # TODO can be removed when updating to uchardet > 0.0.8
+      - -DCMAKE_POLICY_VERSION_MINIMUM=3.5
+    cleanup:
+      - /bin
+      - /include
+      - /lib/pkgconfig
+      - /share/man
+    sources:
+      - type: archive
+        url: https://www.freedesktop.org/software/uchardet/releases/uchardet-0.0.8.tar.xz
+        sha256: e97a60cfc00a1c147a674b097bb1422abd9fa78a2d9ce3f3fdcc2e78a34ac5f0
+        x-checker-data:
+          type: html
+          url: https://www.freedesktop.org/software/uchardet/releases/
+          version-pattern: uchardet-(\d\.\d+\.?\d*).tar.xz
+          url-template: https://www.freedesktop.org/software/uchardet/releases/uchardet-$version.tar.xz
+
+  - name: libass
+    cleanup:
+      - /include
+      - /lib/pkgconfig
+    config-opts:
+      - --disable-static
+      - --enable-asm
+      - --enable-harfbuzz
+      - --enable-fontconfig
+    sources:
+      - type: git
+        url: https://github.com/libass/libass.git
+        tag: 0.17.4
+        commit: bbb3c7f1570a4a021e52683f3fbdf74fe492ae84
+        x-checker-data:
+          type: git
+          tag-pattern: ^(\d\.\d{1,3}\.\d{1,2})$
+
+  - name: libcdio
+    config-opts:
+      - --disable-static
+      - --disable-example-progs
+    cleanup:
+      - /include
+      - /lib/pkgconfig
+    sources:
+      - type: archive
+        url: https://ftp.gnu.org/gnu/libcdio/libcdio-2.1.0.tar.bz2
+        mirror-urls:
+          - https://mirrors.kernel.org/gnu/libcdio/libcdio-2.1.0.tar.bz2
+          - https://mirrors.ocf.berkeley.edu/gnu/libcdio/libcdio-2.1.0.tar.bz2
+          - https://ftpmirror.gnu.org/gnu/libcdio/libcdio-2.1.0.tar.bz2
+        sha256: 8550e9589dbd594bfac93b81ecf129b1dc9d0d51e90f9696f1b2f9b2af32712b
+        x-checker-data:
+          type: html
+          url: https://ftp.gnu.org/gnu/libcdio/
+          version-pattern: libcdio-(\d\.\d+\.?\d*).tar.bz2
+          url-template: https://ftp.gnu.org/gnu/libcdio/libcdio-$version.tar.bz2
+
+  - name: libcdio-paranoia
+    config-opts:
+      - --disable-static
+      - --disable-example-progs
+    cleanup:
+      - /include
+      - /lib/pkgconfig
+    sources:
+      - type: archive
+        url: https://ftp.gnu.org/gnu/libcdio/libcdio-paranoia-10.2+2.0.2.tar.bz2
+        mirror-urls:
+          - https://mirrors.kernel.org/gnu/libcdio/libcdio-paranoia-10.2+2.0.1.tar.bz2
+          - https://mirrors.ocf.berkeley.edu/gnu/libcdio/libcdio-paranoia-10.2+2.0.1.tar.bz2
+          - https://ftpmirror.gnu.org/gnu/libcdio/libcdio-paranoia-10.2+2.0.1.tar.bz2
+        sha256: 186892539dedd661276014d71318c8c8f97ecb1250a86625256abd4defbf0d0c
+        x-checker-data:
+          type: html
+          url: https://ftp.gnu.org/gnu/libcdio/
+          version-pattern: libcdio-paranoia-([\d\.\+-]+).tar.bz2
+          url-template: https://ftp.gnu.org/gnu/libcdio/libcdio-paranoia-$version.tar.bz2
+
+  - name: libdvdread
+    buildsystem: meson
+    cleanup:
+      - /include
+      - /lib/pkgconfig
+    sources:
+      - type: archive
+        url: https://download.videolan.org/pub/videolan/libdvdread/7.0.1/libdvdread-7.0.1.tar.xz
+        mirror-urls:
+          - https://videolan.mirror.ba/libdvdread/6.1.3/libdvdread-6.1.3.tar.bz2
+          - https://videolan.c3sl.ufpr.br/libdvdread/6.1.3/libdvdread-6.1.3.tar.bz2
+        sha256: 2e3e04a305c15c3963aa03ae1b9a83c1d239880003fcf3dde986d3943355d407
+        x-checker-data:
+          type: html
+          url: https://download.videolan.org/pub/videolan/libdvdread/last/
+          version-pattern: libdvdread-([\w.]+)\.tar\.
+          url-template: https://download.videolan.org/pub/videolan/libdvdread/$version/libdvdread-$version.tar.xz
+
+  - name: libdvdnav
+    buildsystem: meson
+    cleanup:
+      - /include
+      - /lib/pkgconfig
+    sources:
+      - type: archive
+        url: https://download.videolan.org/pub/videolan/libdvdnav/7.0.0/libdvdnav-7.0.0.tar.xz
+        mirror-urls:
+          - https://videolan.mirror.ba/libdvdnav/6.1.1/libdvdnav-6.1.1.tar.bz2
+          - https://videolan.c3sl.ufpr.br/libdvdnav/6.1.1/libdvdnav-6.1.1.tar.bz2
+        sha256: a2a18f5ad36d133c74bf9106b6445806fa253b09141a46392550394b647b221e
+        x-checker-data:
+          type: html
+          url: https://download.videolan.org/pub/videolan/libdvdnav/last/
+          version-pattern: libdvdnav-([\w.]+)\.tar\.
+          url-template: https://download.videolan.org/pub/videolan/libdvdnav/$version/libdvdnav-$version.tar.xz
+
+  - name: libaacs
+    config-opts:
+      - --disable-static
+      - --disable-bdjava-jar
+    cleanup:
+      - /include
+      - /lib/pkgconfig
+    sources:
+      - sha256: a88aa0ebe4c98a77f7aeffd92ab3ef64ac548c6b822e8248a8b926725bea0a39
+        type: archive
+        url: https://download.videolan.org/pub/videolan/libaacs/0.11.1/libaacs-0.11.1.tar.bz2
+        mirror-urls:
+          - https://videolan.mirror.ba/libaacs/0.11.1/libaacs-0.11.1.tar.bz2
+          - https://videolan.c3sl.ufpr.br/libaacs/0.11.1/libaacs-0.11.1.tar.bz2
+        x-checker-data:
+          type: html
+          url: https://download.videolan.org/pub/videolan/libaacs/last/
+          version-pattern: libaacs-([\w.]+)\.tar\.
+          url-template: https://download.videolan.org/pub/videolan/libaacs/$version/libaacs-$version.tar.bz2
+
+      # fix broken detection of libgcrypt >= 1.11.0
+      # see
+      #  https://gitlab.archlinux.org/archlinux/packaging/packages/libaacs/-/commit/d3f096b01f2b593ab0739f3a9eb64331b99553e7
+      #  https://salsa.debian.org/multimedia-team/libaacs/-/commit/87e3cd8aeaa165624d531b2789f9fd9e5d9c01f5
+      - type: shell
+        commands:
+          - rm --force --verbose m4/libgcrypt.m4
+          - autoreconf --force --install --verbose
+          - libtoolize
+
+  - name: libbluray
+    buildsystem: meson
+    config-opts:
+      - -Dbdj_jar=disabled
+    cleanup:
+      - /include
+      - /lib/pkgconfig
+    sources:
+      - sha256: 77937baf07eadda4b2b311cf3af4c50269d2ea3165041f5843d96476c4c92777
+        type: archive
+        url: https://download.videolan.org/pub/videolan/libbluray/1.4.0/libbluray-1.4.0.tar.xz
+        mirror-urls:
+          - https://videolan.mirror.ba/libbluray/1.4.0/libbluray-1.4.0.tar.xz
+          - https://videolan.c3sl.ufpr.br/libbluray/1.4.0/libbluray-1.4.0.tar.xz
+        x-checker-data:
+          type: html
+          url: https://download.videolan.org/pub/videolan/libbluray/last/
+          version-pattern: libbluray-([\w.]+)\.tar\.
+          url-template: https://download.videolan.org/pub/videolan/libbluray/$version/libbluray-$version.tar.xz
+
+  - name: zimg
+    config-opts:
+      - --disable-static
+    cleanup:
+      - /include
+      - /lib/pkgconfig
+      - /share/doc
+    sources:
+      - type: archive
+        archive-type: tar
+        url: https://api.github.com/repos/sekrit-twc/zimg/tarball/release-3.0.6
+        sha256: 15140e491c4ce9db5f02a038d8a1eb53e9151b55eeed06a2899425a6ebfef367
+        x-checker-data:
+          type: json
+          url: https://api.github.com/repos/sekrit-twc/zimg/releases/latest
+          url-query: .tarball_url
+          version-query: .tag_name | sub("^release-"; "")
+          timestamp-query: .published_at
+
+  - name: Tesseract
+    config-opts:
+      - --disable-static
+    modules:
+      - name: Leptonica
+        config-opts:
+          - --disable-static
+          - --with-pic
+        sources:
+          - type: archive
+            url: http://www.leptonica.org/source/leptonica-1.87.0.tar.gz
+            sha256: c73363397f96eb1295602bf44d708a994ad42046c791bf03ea0505d829bdb6a7
+            x-checker-data:
+              type: anitya
+              project-id: 1549
+              stable-only: true
+              url-template: http://www.leptonica.org/source/leptonica-$version.tar.gz
+        cleanup:
+          - /bin
+    sources:
+      - type: git
+        url: https://github.com/tesseract-ocr/tesseract.git
+        tag: 5.5.2
+        commit: 6e1d56a847e697de07b38619356550e5cf4e8633
+        x-checker-data:
+          type: json
+          url: https://api.github.com/repos/tesseract-ocr/tesseract/releases/latest
+          timestamp-query: .published_at
+          tag-query: .tag_name
+          version-query: .tag_name
+    cleanup:
+      - /bin
+
+  - name: ImageMagick
+    config-opts:
+      - --disable-static
+      - --disable-docs
+      - --with-hdri
+      - --with-pic
+    sources:
+      - type: archive
+        url: https://github.com/ImageMagick/ImageMagick/archive/7.1.2-12.tar.gz
+        sha256: 521fa7a8c0f664a3f5cf7437cbcc219f12bd6d5fe0c1fb014f212fa145076e60
+        x-checker-data:
+          type: anitya
+          project-id: 1372
+          stable-only: true
+          url-template: https://github.com/ImageMagick/ImageMagick/archive/$version.tar.gz
+    cleanup:
+      - /bin
+      - /etc
+      - /lib/ImageMagick*
+      - /share/ImageMagick*
+
+  - name: rubberband
+    buildsystem: meson
+    cleanup:
+      - /include
+      - /lib/pkgconfig
+    sources:
+      - type: git
+        url: https://github.com/breakfastquay/rubberband.git
+        #mirror-urls:
+        #  - https://hg.sr.ht/~breakfastquay/rubberband
+        tag: v4.0.0
+        commit: 1d95888bec3ae0a17c0c4af791810d5a63f6bc35
+        x-checker-data:
+          type: git
+          tag-pattern: ^v([\d.]+)$
+
+  - name: mujs
+    buildsystem: autotools
+    no-autogen: true
+    make-args:
+      - release
+    make-install-args:
+      - prefix=/app
+      - install-shared
+    cleanup:
+      - /bin
+      - /include
+      - /lib/pkgconfig
+    sources:
+      - type: git
+        url: https://codeberg.org/ccxvii/mujs.git
+        tag: 1.3.8
+        commit: 307f18c4216420f2f56e22d8e7040baa39a6304a
+        x-checker-data:
+          type: json
+          url: https://codeberg.org/api/v1/repos/ccxvii/mujs/tags
+          tag-query: .[0].name
+          version-query: $tag
+          timestamp-query: .[0].commit.created
+
+      # The unicode character database files are downloaded in the makefile rules `UnicodeData.txt` and `SpecialCasing.txt`.
+      # This does not work with flatpak because there is no network access during the build step.
+      #
+      # TODO: check for updated urls when updating mujs
+      - type: file
+        url: https://www.unicode.org/Public/16.0.0/ucd/UnicodeData.txt
+        sha256: ff58e5823bd095166564a006e47d111130813dcf8bf234ef79fa51a870edb48f
+
+      - type: file
+        url: https://www.unicode.org/Public/16.0.0/ucd/SpecialCasing.txt
+        sha256: 8d5de354eef79f2395a54c9c7dcebbaf3d30fc962d0f85611ea97aa973a0c451
+
+  - name: x264
+    cleanup:
+      - /include
+      - /lib/pkgconfig
+      - /share/man
+    config-opts:
+      - --disable-cli
+      - --enable-shared
+    sources:
+      - type: git
+        url: https://code.videolan.org/videolan/x264.git
+        commit: b35605ace3ddf7c1a5d67a2eb553f034aef41d55
+        # Every commit to the stable branch is considered a release
+        # https://code.videolan.org/videolan/x264/-/issues/35
+        x-checker-data:
+          type: json
+          url: https://code.videolan.org/api/v4/projects/536/repository/branches/stable
+          commit-query: .commit.id
+          version-query: .commit.short_id
+          timestamp-query: .commit.created_at
+
+  - name: x265
+    buildsystem: cmake
+    subdir: source
+    config-opts:
+      - -DCMAKE_BUILD_TYPE=Release
+      - -DBUILD_STATIC=0
+      # TODO can be removed when updating to x265 > 4.1
+      - -DCMAKE_POLICY_VERSION_MINIMUM=3.5
+    cleanup:
+      - /include
+      - /lib/pkgconfig
+      - /share/man
+    sources:
+      - type: git
+        url: https://bitbucket.org/multicoreware/x265_git.git
+        tag: '4.0'
+        commit: 6318f223684118a2c71f67f3f4633a9e35046b00
+        # build is failing with 4.1 will enable with 4.2
+        #x-checker-data:
+        #  type: git
+        #  tag-pattern: ^([\d.]+)$
+
+      # fix cmake build issue
+      # https://bitbucket.org/multicoreware/x265_git/commits/b354c009a60bcd6d7fc04014e200a1ee9c45c167
+      - type: patch
+        path: patches/x265-cmake_policy.patch
+
+  - name: libmysofa
+    buildsystem: cmake
+    config-opts:
+      - -DBUILD_TESTS=OFF
+    sources:
+      - type: git
+        commit: 7a0c07111a3d7230ec534e08925c24a7525f33c0
+        tag: v1.3.4
+        url: https://github.com/hoene/libmysofa.git
+        x-checker-data:
+          type: git
+          tag-pattern: ^v([\d.]+)$
+
+  - name: libbs2b
+    buildsystem: autotools
+    config-opts:
+      - --disable-static
+    cleanup:
+      - /include
+      - /lib/pkgconfig
+    sources:
+      - type: archive
+        archive-type: tar
+        url: https://downloads.sourceforge.net/sourceforge/bs2b/libbs2b-3.1.0.tar.gz
+        sha256: 6aaafd81aae3898ee40148dd1349aab348db9bfae9767d0e66e0b07ddd4b2528
+        x-checker-data:
+          type: html
+          url: https://sourceforge.net/projects/bs2b/files/libbs2b/
+          version-pattern: projects/bs2b/files/libbs2b/(\d+\.\d+\.\d+)
+          url-template: https://downloads.sourceforge.net/sourceforge/bs2b/libbs2b-$version.tar.gz
+      # https://src.fedoraproject.org/rpms/libbs2b/blob/rawhide/f/libbs2b.spec#_40
+      - type: shell
+        commands:
+          - sed -i -e 's/lzma/xz/g' configure.ac
+          - autoreconf -vif
+
+  - name: ffmpeg
+    cleanup:
+      - /include
+      - /lib/pkgconfig
+      - /share/ffmpeg/examples
+    config-opts:
+      - --disable-debug
+      - --disable-doc
+      - --disable-static
+      - --enable-encoder=png
+      - --enable-gnutls
+      - --enable-gpl
+      - --enable-shared
+      - --enable-version3
+      - --enable-libaom
+      - --enable-libass
+      - --enable-libbs2b
+      - --enable-libdav1d
+      - --enable-libfreetype
+      - --enable-libmp3lame
+      - --enable-libopus
+      - --enable-libjxl
+      - --enable-libmysofa
+      - --enable-libtheora
+      - --enable-libv4l2
+      - --enable-libvorbis
+      - --enable-libvpx
+      - --enable-libx264
+      - --enable-libx265
+      - --enable-libwebp
+      - --enable-libsmbclient
+      - --enable-libxml2
+      - --enable-vulkan
+      - --enable-libdrm
+      - --enable-vaapi
+
+    sources:
+      - type: git
+        url: https://github.com/FFmpeg/FFmpeg.git
+        #mirror-urls:
+        #  - https://git.ffmpeg.org/ffmpeg.git
+        commit: 894da5ca7d742e4429ffb2af534fcda0103ef593
+        tag: n8.0.1
+        x-checker-data:
+          type: git
+          tag-pattern: ^n([\d.]{3,7})$
+
+  - name: libsixel
+    buildsystem: meson
+    cleanup:
+      - /include
+      - /lib/pkgconfig
+    sources:
+      - type: archive
+        archive-type: tar
+        url: https://api.github.com/repos/libsixel/libsixel/tarball/refs/tags/v1.10.5
+        sha256: 402da9e24caea62fe1e4c5d6f9c9211141f7a5d8016e717527ecde10c5522344
+        x-checker-data:
+          type: json
+          url: https://api.github.com/repos/libsixel/libsixel/tags
+          url-query: .[0].tarball_url
+          version-query: .[0].name
+
+  - name: vapoursynth
+    config-opts:
+      - --with-python-prefix=${FLATPAK_DEST}
+
+    sources:
+      - type: archive
+        url: https://github.com/vapoursynth/vapoursynth/archive/72.tar.gz
+        sha256: f8fcc5e2e9d2195454310e3356ea13e5334125891e452cc6543e985f28cacd22
+        x-checker-data:
+          type: json
+          url: https://api.github.com/repos/vapoursynth/vapoursynth/releases/latest
+          version-query: .name
+          timestamp-query: .published_at
+          url-query: .tarball_url
+
+  - name: libplacebo
+    buildsystem: meson
+    config-opts:
+      - -Dvulkan=enabled
+      - -Dshaderc=enabled
+    cleanup:
+      - /include
+      - /lib/pkgconfig
+    sources:
+      - type: git
+        url: https://github.com/haasn/libplacebo.git
+        #mirror-urls:
+        #  - https://code.videolan.org/videolan/libplacebo.git
+        tag: v7.349.0
+        commit: 1fd3c7bde7b943fe8985c893310b5269a09b46c5
+        x-checker-data:
+          type: git
+          tag-pattern: ^v([\d.]+)$
+
+      # fix python error: TypeError: expected an Element, not ElementTree
+      # https://code.videolan.org/videolan/libplacebo/-/commit/12509c0f1ee8c22ae163017f0a5e7b8a9d983a17
+      - type: patch
+        path: patches/libplacebo-vulkan-utils_gen-python.patch
+
+  - name: hwdata
+    buildsystem: autotools
+    sources:
+      - type: archive
+        url: https://github.com/vcrhonek/hwdata/archive/refs/tags/v0.394.tar.gz
+        sha256: b7c3fd7214a3b7c49d2661db127a712dc11cffd1799f793947aa1cb20aaf3298
+
+  - name: libdisplay-info
+    buildsystem: meson
+
+    sources:
+      - type: archive
+        url: https://gitlab.freedesktop.org/emersion/libdisplay-info/-/archive/0.2.0/libdisplay-info-0.2.0.tar.gz
+        sha256: f7331fcaf5527251b84c8fb84238d06cd2f458422ce950c80e86c72927aa8c2b
+
+  - name: mpv
+    buildsystem: meson
+
+    config-opts:
+      - -Dalsa=enabled
+      - -Dbuild-date=false
+      - -Dcdda=enabled
+      - -Dcplayer=true
+      - -Dcplugins=enabled
+      - -Dcuda-hwaccel=enabled
+      - -Dcuda-interop=enabled
+      - -Ddmabuf-wayland=enabled
+      - -Ddrm=enabled
+      - -Ddvbin=enabled
+      - -Ddvdnav=enabled
+      - -Degl-drm=enabled
+      - -Degl-wayland=enabled
+      - -Degl-x11=enabled
+      - -Degl=enabled
+      - -Dgbm=enabled
+      - -Dgl-x11=enabled
+      - -Dgl=enabled
+      - -Diconv=enabled
+      - -Djack=enabled
+      - -Djavascript=enabled
+      - -Djpeg=enabled
+      - -Dlcms2=enabled
+      - -Dlibarchive=enabled
+      - -Dlibavdevice=enabled
+      - -Dlibbluray=enabled
+      - -Dlibmpv=true
+      - -Dlua=enabled
+      - -Dopenal=enabled
+      - -Dpipewire=enabled
+      - -Dplain-gl=enabled
+      - -Dpulse=enabled
+      - -Drubberband=enabled
+      #- -Dsdl2-audio=enabled
+      #- -Dsdl2-gamepad=enabled
+      #- -Dsdl2-video=enabled
+      #- -Dsdl2=enabled
+      - -Duchardet=enabled
+      - -Dvaapi-drm=enabled
+      - -Dvaapi-wayland=enabled
+      - -Dvaapi-x11=enabled
+      - -Dvaapi=enabled
+      - -Dvapoursynth=enabled
+      - -Dvdpau-gl-x11=enabled
+      - -Dvdpau=enabled
+      - -Dvector=enabled
+      - -Dvulkan=enabled
+      - -Dwayland=enabled
+      - -Dwerror=false
+      - -Dx11=enabled
+      - -Dxv=enabled
+      - -Dzimg=enabled
+      - -Dzlib=enabled
+    post-install:
+      - mv /app/bin/mpv /app/bin/mpv-bin
+      # save screenshots at xdg-pictures/mpv
+      - mkdir -p /app/etc/mpv
+      - echo "screenshot-directory=~/.var/app/com.retro_exo.mpv/Pictures/mpv" > /app/etc/mpv/mpv.conf
+    sources:
+      - type: git
+        url: https://github.com/mpv-player/mpv.git
+        tag: v0.41.0
+        commit: 41f6a645068483470267271e1d09966ca3b9f413
+        x-checker-data:
+          type: git
+          tag-pattern: ^v([\d.]+)$
+          is-main-source: true
+
+      # required to build against ffmpeg 8.0
+      # https://github.com/mpv-player/mpv/commit/26b29fba02a2782f68e2906f837d21201fc6f1b9
+      #- type: patch
+      #  path: patches/mpv-demux_mkv-fix-compilation-after-deprecated-definitio.patch
+
+
+# Scripts for mpv
+  - name: mpv-wrapper
+    buildsystem: simple
+    build-commands:
+      - install -D mpv /app/bin/mpv
+    sources:
+      - type: file
+        path: mpv
+
+  - name: mpv-mpris
+    no-autogen: true
+    make-install-args:
+      - SCRIPTS_DIR=/app/etc/mpv/scripts
+    sources:
+      - type: archive
+        archive-type: tar
+        url: https://api.github.com/repos/hoyon/mpv-mpris/tarball/1.1
+        sha256: 08d6b53a41224710ebed1c4d6daee815686e0f2f10e3f81778f4411562ed5958
+        x-checker-data:
+          type: json
+          url: https://api.github.com/repos/hoyon/mpv-mpris/releases/latest
+          version-query: .name
+          url-query: .tarball_url
+
+  - name: ed
+    build-options:
+      no-debuginfo: true
+    buildsystem: autotools
+    sources:
+      - type: archive
+        url: https://ftp.gnu.org/gnu/ed/ed-1.22.4.tar.lz
+        mirror-urls:
+          - https://mirrors.kernel.org/gnu/ed/ed-1.20.1.tar.lz
+          - https://mirrors.ocf.berkeley.edu/gnu/ed/ed-1.20.1.tar.lz
+          - https://ftpmirror.gnu.org/gnu/ed/ed-1.20.1.tar.lz
+        sha256: 987a1ebbbad3fcf63a1ffa9e29b3fa7de065150d16319d0a49dd8b57f81d3e9c
+        x-checker-data:
+          type: html
+          url: https://ftp.gnu.org/gnu/ed/
+          version-pattern: ed-(\d\.\d+\.?\d*).tar.lz
+          url-template: https://ftp.gnu.org/gnu/ed/ed-$version.tar.lz
+
+  - name: bc
+    build-options:
+      no-debuginfo: true
+    buildsystem: autotools
+    sources:
+      - type: archive
+        url: https://ftp.gnu.org/gnu/bc/bc-1.08.2.tar.gz
+        mirror-urls:
+          - https://mirrors.kernel.org/gnu/bc/bc-1.07.1.tar.gz
+          - https://mirrors.ocf.berkeley.edu/gnu/bc/bc-1.07.1.tar.gz
+          - https://ftpmirror.gnu.org/gnu/bc/bc-1.07.1.tar.gz
+        sha256: ae470fec429775653e042015edc928d07c8c3b2fc59765172a330d3d87785f86
+        x-checker-data:
+          type: html
+          url: https://ftp.gnu.org/gnu/bc/
+          version-pattern: bc-(\d\.\d+\.?\d*).tar.gz
+          url-template: https://ftp.gnu.org/gnu/bc/bc-$version.tar.gz
+
+### Python modules for mpv scripts
+
+  - name: python_dateutil
+    buildsystem: simple
+    build-commands:
+      - pip3 install --prefix=/app six*.whl python_dateutil*.whl
+    sources:
+      # install six to fix https://github.com/dateutil/dateutil/issues/1430
+      - type: file
+        url: https://files.pythonhosted.org/packages/b7/ce/149a00dd41f10bc29e5921b496af8b574d8413afcd5e30dfa0ed46c2cc5e/six-1.17.0-py2.py3-none-any.whl
+        sha256: 4721f391ed90541fddacab5acf947aa0d3dc7d27b2e1e8eda2be8970586c3274
+        x-checker-data:
+          type: pypi
+          name: six
+          packagetype: bdist_wheel
+
+      - type: file
+        url: https://files.pythonhosted.org/packages/ec/57/56b9bcc3c9c6a792fcbaf139543cee77261f3651ca9da0c93f5c1221264b/python_dateutil-2.9.0.post0-py2.py3-none-any.whl
+        sha256: a8b2bc7bffae282281c8140a97d3aa9c14da0b136dfe83f850eea9a5f7470427
+        x-checker-data:
+          type: pypi
+          name: python_dateutil
+          packagetype: bdist_wheel
+
+  - name: urllib3
+    buildsystem: simple
+    build-commands:
+      - pip3 install --prefix=/app urllib3*.whl
+    sources:
+      - type: file
+        url: https://files.pythonhosted.org/packages/33/cf/8435d5a7159e2a9c83a95896ed596f68cf798005fe107cc655b5c5c14704/urllib3-1.26.20-py2.py3-none-any.whl
+        sha256: 0ed14ccfbf1c30a9072c7ca157e4319b70d65f623e91e7b32fadb2853431016e
+        x-checker-data:
+          # Requests doesn't work with > 1.26.x for now
+          # https://github.com/flathub/io.mpv.Mpv/pull/190#issuecomment-1523855709
+          versions: {'>=': 1.21.1, <: '1.27'}
+          type: pypi
+          name: urllib3
+          packagetype: bdist_wheel
+
+  - name: soupsieve
+    buildsystem: simple
+    build-commands:
+      - pip3 install --prefix=/app soupsieve*.whl
+    sources:
+      - type: file
+        url: https://files.pythonhosted.org/packages/48/f3/b67d6ea49ca9154453b6d70b34ea22f3996b9fa55da105a79d8732227adc/soupsieve-2.8.1-py3-none-any.whl
+        sha256: a11fe2a6f3d76ab3cf2de04eb339c1be5b506a8a47f2ceb6d139803177f85434
+        x-checker-data:
+          type: pypi
+          name: soupsieve
+          packagetype: bdist_wheel
+
+  - name: rebulk
+    buildsystem: simple
+    build-commands:
+      - pip3 install --prefix=/app rebulk-*.whl
+    sources:
+      - type: file
+        url: https://files.pythonhosted.org/packages/84/4d/df073d593f7e7e4a5a7e19148b2e9b4ae63b4ddcbb863f1e7bb2b6f19c62/rebulk-3.2.0-py3-none-any.whl
+        sha256: 6bc31ae4b37200623c5827d2f539f9ec3e52b50431322dad8154642a39b0a53e
+        x-checker-data:
+          type: pypi
+          name: rebulk
+          packagetype: bdist_wheel
+
+  - name: pbr
+    buildsystem: simple
+    build-commands:
+      - pip3 install --prefix=/app pbr-*.whl
+    sources:
+      - type: file
+        url: https://files.pythonhosted.org/packages/c0/db/61efa0d08a99f897ef98256b03e563092d36cc38dc4ebe4a85020fe40b31/pbr-7.0.3-py2.py3-none-any.whl
+        sha256: ff223894eb1cd271a98076b13d3badff3bb36c424074d26334cd25aebeecea6b
+        x-checker-data:
+          type: pypi
+          name: pbr
+          packagetype: bdist_wheel
+
+  - name: idna
+    buildsystem: simple
+    build-commands:
+      - pip3 install --prefix=/app idna-*.whl
+    sources:
+      - type: file
+        url: https://files.pythonhosted.org/packages/0e/61/66938bbb5fc52dbdf84594873d5b51fb1f7c7794e9c0f5bd885f30bc507b/idna-3.11-py3-none-any.whl
+        sha256: 771a87f49d9defaf64091e6e6fe9c18d4833f140bd19464795bc32d966ca37ea
+        x-checker-data:
+          type: pypi
+          name: idna
+          packagetype: bdist_wheel
+
+  - name: decorator
+    buildsystem: simple
+    build-commands:
+      - pip3 install --prefix=/app decorator-*.whl
+    sources:
+      - type: file
+        url: https://files.pythonhosted.org/packages/4e/8c/f3147f5c4b73e7550fe5f9352eaa956ae838d5c51eb58e7a25b9f3e2643b/decorator-5.2.1-py3-none-any.whl
+        sha256: d316bb415a2d9e2d2b3abcc4084c6502fc09240e292cd76a76afc106a1c8e04a
+        x-checker-data:
+          type: pypi
+          name: decorator
+          packagetype: bdist_wheel
+
+  - name: charset_normalizer
+    buildsystem: simple
+    build-commands:
+      - pip3 install --prefix=/app charset_normalizer-*.whl
+    sources:
+      - type: file
+        url: https://files.pythonhosted.org/packages/0a/4c/925909008ed5a988ccbb72dcc897407e5d6d3bd72410d69e051fc0c14647/charset_normalizer-3.4.4-py3-none-any.whl
+        sha256: 7a32c560861a02ff789ad905a2fe94e3f840803362c84fecf1851cb4cf3dc37f
+        x-checker-data:
+          type: pypi
+          name: charset_normalizer
+          packagetype: bdist_wheel
+
+  - name: certifi
+    buildsystem: simple
+    build-commands:
+      - pip3 install --prefix=/app certifi-*.whl
+    sources:
+      - type: file
+        url: https://files.pythonhosted.org/packages/70/7d/9bc192684cea499815ff478dfcdc13835ddf401365057044fb721ec6bddb/certifi-2025.11.12-py3-none-any.whl
+        sha256: 97de8790030bbd5c2d96b7ec782fc2f7820ef8dba6db909ccf95449f2d062d4b
+        x-checker-data:
+          type: pypi
+          name: certifi
+          packagetype: bdist_wheel
+
+  - name: stevedore
+    buildsystem: simple
+    build-commands:
+      - pip3 install --prefix=/app stevedore-*.whl
+    sources:
+      - type: file
+        url: https://files.pythonhosted.org/packages/f4/40/8561ce06dc46fd17242c7724ab25b257a2ac1b35f4ebf551b40ce6105cfa/stevedore-5.6.0-py3-none-any.whl
+        sha256: 4a36dccefd7aeea0c70135526cecb7766c4c84c473b1af68db23d541b6dc1820
+        x-checker-data:
+          type: pypi
+          name: stevedore
+          packagetype: bdist_wheel
+
+  - name: requests
+    buildsystem: simple
+    build-commands:
+      - pip3 install --prefix=/app requests-*.whl
+    sources:
+      - type: file
+        url: https://files.pythonhosted.org/packages/1e/db/4254e3eabe8020b458f1a747140d32277ec7a271daf1d235b70dc0b4e6e3/requests-2.32.5-py3-none-any.whl
+        sha256: 2462f94637a34fd532264295e186976db0f5d453d1cdd31473c85a6a161affb6
+        x-checker-data:
+          type: pypi
+          name: requests
+          packagetype: bdist_wheel
+
+  - name: rarfile
+    buildsystem: simple
+    build-commands:
+      - pip3 install --prefix=/app rarfile-*.whl
+    sources:
+      - type: file
+        url: https://files.pythonhosted.org/packages/62/fc/ab37559419ca36dd8dd317c3a98395ed4dcee2beeb28bf6059b972906727/rarfile-4.2-py3-none-any.whl
+        sha256: 8757e1e3757e32962e229cab2432efc1f15f210823cc96ccba0f6a39d17370c9
+        x-checker-data:
+          type: pypi
+          name: rarfile
+          packagetype: bdist_wheel
+
+  - name: pytz
+    buildsystem: simple
+    build-commands:
+      - pip3 install --prefix=/app pytz-*.whl
+    sources:
+      - type: file
+        url: https://files.pythonhosted.org/packages/81/c4/34e93fe5f5429d7570ec1fa436f1986fb1f00c3e0f43a589fe2bbcd22c3f/pytz-2025.2-py2.py3-none-any.whl
+        sha256: 5ddf76296dd8c44c26eb8f4b6f35488f3ccbf6fbbd7adee0b7262d43f0ec2f00
+        x-checker-data:
+          type: pypi
+          name: pytz
+          packagetype: bdist_wheel
+
+  - name: pysrt
+    buildsystem: simple
+    build-commands:
+      - python3 setup.py install --prefix=/app --root=/
+    sources:
+      - type: archive
+        url: https://files.pythonhosted.org/packages/31/1a/0d858da1c6622dcf16011235a2639b0a01a49cecf812f8ab03308ab4de37/pysrt-1.1.2.tar.gz
+        sha256: b4f844ba33e4e7743e9db746492f3a193dc0bc112b153914698e7c1cdeb9b0b9
+        x-checker-data:
+          type: pypi
+          name: pysrt
+
+  - name: babelfish
+    buildsystem: simple
+    build-commands:
+      - pip3 install --prefix=/app babelfish-*.whl
+    sources:
+      - type: file
+        url: https://files.pythonhosted.org/packages/95/a1/bd4f759db13cd8beb9c9f68682aced5d966781b9d7380cf514a306f56762/babelfish-0.6.1-py3-none-any.whl
+        sha256: 512f1501d4c8f7d38f0921f48660be7542de1a7b24abb6a6a65324a670150293
+        x-checker-data:
+          type: pypi
+          name: babelfish
+          packagetype: bdist_wheel
+
+  - name: guessit
+    buildsystem: simple
+    build-commands:
+      - pip3 install --prefix=/app guessit-*.whl
+    sources:
+      - type: file
+        url: https://files.pythonhosted.org/packages/b8/9b/924a8f9709c3143d4c9a301a88042cbce37e09789378217284b19d4f8132/guessit-3.8.0-py3-none-any.whl
+        sha256: eb5747b1d0fbca926562c1e5894dbc3f6507c35e8c0bd9e38148401cd9579d83
+        x-checker-data:
+          type: pypi
+          name: guessit
+          packagetype: bdist_wheel
+
+  - name: enzyme
+    buildsystem: simple
+    build-commands:
+      - pip3 install --prefix=/app enzyme-*.whl
+    sources:
+      - type: file
+        url: https://files.pythonhosted.org/packages/67/bc/be0fbce0eb198f4361f462520122151b0ec347ecaeb5d349cf36ae0ac751/enzyme-0.5.2-py3-none-any.whl
+        sha256: 5a85306c136368d78f299bb74bf0c5f5d37e2689adc5caec5aba5ee2f029296b
+        x-checker-data:
+          type: pypi
+          name: enzyme
+          packagetype: bdist_wheel
+
+  - name: typing-extensions
+    buildsystem: simple
+    build-commands:
+      - pip3 install --prefix=/app typing*.whl
+    sources:
+      - type: file
+        url: https://files.pythonhosted.org/packages/18/67/36e9267722cc04a6b9f15c7f3441c2363321a3ea07da7ae0c0707beb2a9c/typing_extensions-4.15.0-py3-none-any.whl
+        sha256: f0fa19c6845758ab08074a0cfa8b7aecb71c999ca73d62883bc25cc018c4e548
+        x-checker-data:
+          type: pypi
+          name: typing-extensions
+          packagetype: bdist_wheel
+
+  - name: dogpile
+    buildsystem: simple
+    build-commands:
+      - pip3 install --prefix=/app dogpile*.whl
+    sources:
+      - type: file
+        url: https://files.pythonhosted.org/packages/dc/80/12235e5b75bb2c586733280854f131b86051e0bbdfb55349ff70d0f72cf9/dogpile_cache-1.5.0-py3-none-any.whl
+        sha256: dc7b47d37844db15e8fdc0243c1b58857a2ddc52a5118237a97127bac200e18d
+        x-checker-data:
+          type: pypi
+          name: dogpile.cache
+          packagetype: bdist_wheel
+
+  - name: click
+    buildsystem: simple
+    build-commands:
+      - pip3 install --prefix=/app click-*.whl
+    sources:
+      - type: file
+        url: https://files.pythonhosted.org/packages/98/78/01c019cdb5d6498122777c1a43056ebb3ebfeef2076d9d026bfe15583b2b/click-8.3.1-py3-none-any.whl
+        sha256: 981153a64e25f12d547d3426c367a4857371575ee7ad18df2a6183ab0545b2a6
+        x-checker-data:
+          type: pypi
+          name: click
+          packagetype: bdist_wheel
+
+  - name: chardet
+    buildsystem: simple
+    build-commands:
+      - pip3 install --prefix=/app chardet-*.whl
+    sources:
+      - type: file
+        url: https://files.pythonhosted.org/packages/38/6f/f5fbc992a329ee4e0f288c1fe0e2ad9485ed064cac731ed2fe47dcc38cbf/chardet-5.2.0-py3-none-any.whl
+        sha256: e1cf59446890a00105fe7b7912492ea04b6e6f06d4b742b2c788469e34c82970
+        x-checker-data:
+          type: pypi
+          name: chardet
+          packagetype: bdist_wheel
+
+  - name: beautifulsoup4
+    buildsystem: simple
+    build-commands:
+      - pip3 install --prefix=/app beautifulsoup4-*.whl
+    sources:
+      - type: file
+        url: https://files.pythonhosted.org/packages/1a/39/47f9197bdd44df24d67ac8893641e16f386c984a0619ef2ee4c51fbbc019/beautifulsoup4-4.14.3-py3-none-any.whl
+        sha256: 0918bfe44902e6ad8d57732ba310582e98da931428d231a5ecb9e7c703a735bb
+        x-checker-data:
+          type: pypi
+          name: beautifulsoup4
+          packagetype: bdist_wheel
+
+  - name: appdirs
+    buildsystem: simple
+    build-commands:
+      - pip3 install --prefix=/app appdirs-*.whl
+    sources:
+      - type: file
+        url: https://files.pythonhosted.org/packages/3b/00/2344469e2084fb287c2e0b57b72910309874c3245463acd6cf5e3db69324/appdirs-1.4.4-py2.py3-none-any.whl
+        sha256: a841dacd6b99318a741b166adb07e19ee71a274450e68237b4650ca1055ab128
+        x-checker-data:
+          type: pypi
+          name: appdirs
+          packagetype: bdist_wheel
+
+#/ ### Python modules for mpv scripts
+
+  # This mpv plugin prevents screen blanking in GNOME (wayland) while playing media.
+  - name: mpv_inhibit_gnome
+    buildsystem: simple
+    build-commands:
+      - make
+      - install -D lib/mpv_inhibit_gnome.so /app/etc/mpv/scripts
+    sources:
+      - type: git
+        url: https://github.com/Guldoman/mpv_inhibit_gnome.git
+        tag: v0.1.3
+        commit: 9069be0f15fa2c222d78a183d4aa1477d8a8f2cd
+        x-checker-data:
+          type: git
+          tag-pattern: ^v([\d.]+)$
