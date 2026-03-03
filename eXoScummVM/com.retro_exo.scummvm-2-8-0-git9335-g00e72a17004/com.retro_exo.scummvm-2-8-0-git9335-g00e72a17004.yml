@@ -9,7 +9,7 @@ finish-args:
   - --socket=fallback-x11
   - --socket=wayland
   - --socket=pulseaudio
-  - --filesystem=home
+  - --filesystem=host
 command: scummvm_wrapper
 cleanup:
   - /include

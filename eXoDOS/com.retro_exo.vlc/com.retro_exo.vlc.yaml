@@ -23,7 +23,7 @@ finish-args:
   - --filesystem=xdg-run/gvfs
 add-extensions:
   org.videolan.VLC.Plugin:
-    versions: 3-5.15-24.08;3-24.08
+    versions: 3-5.15-25.08;3-25.08
     directory: share/vlc/extra
     subdirectories: true
     merge-dirs: plugins
