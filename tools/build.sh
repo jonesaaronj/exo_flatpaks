@@ -25,7 +25,7 @@ pushd $dir
 [ -f "${pkg}.yml" ] && manifest="${pkg}.yml" 
 echo "using manifest: $manifest"
 
-run_command "flatpak run org.flatpak.Builder --disable-rofiles-fuse --install-deps-from=flathub --force-clean ${pkg} ${manifest}"
+run_command "flatpak run org.flatpak.Builder --user --install-deps-from=flathub --force-clean ${pkg} ${manifest}"
 run_command "flatpak build-export export ${pkg}"
 run_command "flatpak build-bundle export ${pkg}.flatpak ${pkg} --runtime-repo=https://flathub.org/repo/flathub.flatpakrepo"
 

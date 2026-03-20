@@ -1,7 +1,7 @@
 {
     "id": "com.retro_exo.gnumeric",
     "runtime": "org.gnome.Platform",
-    "runtime-version": "49",
+    "runtime-version": "50",
     "sdk": "org.gnome.Sdk",
     "command": "gnumeric",
     "appstream-compose": false,
