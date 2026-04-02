@@ -349,15 +349,11 @@ modules:
     make-install-args:
       - PREFIX=/app
     sources:
-      - type: git
-        url: https://github.com/Winetricks/winetricks.git
-        tag: '20260125'
-        commit: b76e1ee79ac57d7aceb384f74518fc423265810c
-        x-checker-data:
-          type: git
-          tag-pattern: ^(\d+)$
+      - type: archive
+        url: https://github.com/Winetricks/winetricks/archive/refs/tags/20260125.tar.gz
+        sha256: 2890bd9fbbade4638e58b4999a237273192df03b58516ae7b8771e09c22d2f56
+        
     modules:
-
       - name: 7zip
         buildsystem: simple
         subdir: CPP/7zip/Bundles/Alone2
@@ -367,13 +363,9 @@ modules:
           - ln -s /app/bin/7zz /app/bin/7za
           - ln -s /app/bin/7zz /app/bin/7z
         sources:
-          - type: git
-            url: https://github.com/ip7z/7zip.git
-            tag: '25.01'
-            commit: 5e96a8279489832924056b1fa82f29d5837c9469
-            x-checker-data:
-              type: git
-              tag-pattern: ^([\d.]+)$
+          - type: archive
+            url: https://github.com/ip7z/7zip/archive/refs/tags/26.00.tar.gz
+            sha256: 07eafed75d661282d402dc2a3edf17e1dbb36fb813f4fbf5a2bad4f6b722aed5
 
       - name: cabextract
         sources:

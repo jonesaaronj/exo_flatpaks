@@ -84,35 +84,23 @@ modules:
   - name: libXmu
     buildsystem: autotools
     sources:
-      - type: git
-        url: https://gitlab.freedesktop.org/xorg/lib/libxmu.git
-        tag: libXmu-1.2.1
-        commit: 792f80402ee06ce69bca3a8f2a84295999c3a170
-        x-checker-data:
-          type: git
-          tag-pattern: ^libXmu-([\d.]+)$
+      - type: archive
+        url: https://gitlab.freedesktop.org/xorg/lib/libxmu/-/archive/libXmu-1.2.1/libxmu-libXmu-1.2.1.tar.gz
+        sha256: 420979c1fd4438a9f41e0086f10c8d2a00125643f6d4ff7ed67282878ae39531
 
   - name: xclip
     buildsystem: autotools
     sources:
-      - type: git
-        url: https://github.com/astrand/xclip.git
-        tag: '0.13'
-        commit: 9aa7090c3b8b437c6489edca32ae43d82e0c1281
-        x-checker-data:
-          type: git
-          tag-pattern: ^(\d+\.\d+)$
+      - type: archive
+        url: https://github.com/astrand/xclip/archive/refs/tags/0.13.tar.gz
+        sha256: ca5b8804e3c910a66423a882d79bf3c9450b875ac8528791fb60ec9de667f758
 
   - name: libXpresent
     buildsystem: autotools
     sources:
-      - type: git
-        url: https://gitlab.freedesktop.org/xorg/lib/libxpresent.git
-        tag: libXpresent-1.0.2
-        commit: 4d92149372461bf575e8a09b1064a2884c38c3aa
-        x-checker-data:
-          type: git
-          tag-pattern: ^libXpresent-([\d.]+)$
+      - type: archive
+        url: https://gitlab.freedesktop.org/xorg/lib/libxpresent/-/archive/libXpresent-1.0.2/libxpresent-libXpresent-1.0.2.tar.gz
+        sha256: d2c6b134e7bd6fccd8460f3c5d9a66741080cc29c2ef09f95586e8f2e709609d
 
   - name: luajit
     no-autogen: true
@@ -122,18 +110,9 @@ modules:
       - /lib/pkgconfig
       - /share/man
     sources:
-      - type: git
-        url: https://github.com/LuaJIT/LuaJIT.git
-        #mirror-urls:
-        #  - https://luajit.org/git/luajit.git
-        disable-shallow-clone: true
-        commit: 7152e15489d2077cd299ee23e3d51a4c599ab14f
-        x-checker-data:
-          type: json
-          url: https://api.github.com/repos/LuaJIT/LuaJIT/branches/v2.1
-          commit-query: .commit.sha
-          version-query: .commit.sha
-          timestamp-query: .commit.commit.committer.date
+      - type: archive
+        url: https://github.com/LuaJIT/LuaJIT/archive/refs/tags/v2.1.0-beta3.tar.gz
+        sha256: 409f7fe570d3c16558e594421c47bdd130238323c9d6fd6c83dedd2aaeb082a8
       - type: shell
         commands:
           - sed -i 's|/usr/local|/app|' ./Makefile
@@ -227,13 +206,9 @@ modules:
       - --enable-harfbuzz
       - --enable-fontconfig
     sources:
-      - type: git
-        url: https://github.com/libass/libass.git
-        tag: 0.17.4
-        commit: bbb3c7f1570a4a021e52683f3fbdf74fe492ae84
-        x-checker-data:
-          type: git
-          tag-pattern: ^(\d\.\d{1,3}\.\d{1,2})$
+      - type: archive
+        url: https://github.com/libass/libass/archive/refs/tags/0.17.4.tar.gz
+        sha256: c287d180d93dc9c9021872574b618ac49027e84cc90e1289318b1ee68bb42251
 
   - name: libcdio
     config-opts:
@@ -402,16 +377,9 @@ modules:
         cleanup:
           - /bin
     sources:
-      - type: git
-        url: https://github.com/tesseract-ocr/tesseract.git
-        tag: 5.5.2
-        commit: 6e1d56a847e697de07b38619356550e5cf4e8633
-        x-checker-data:
-          type: json
-          url: https://api.github.com/repos/tesseract-ocr/tesseract/releases/latest
-          timestamp-query: .published_at
-          tag-query: .tag_name
-          version-query: .tag_name
+      - type: archive
+        url: https://github.com/tesseract-ocr/tesseract/archive/refs/tags/5.5.2.tar.gz
+        sha256: 6235ea0dae45ea137f59c09320406f5888383741924d98855bd2ce0d16b54f21
     cleanup:
       - /bin
 
@@ -425,11 +393,6 @@ modules:
       - type: archive
         url: https://github.com/ImageMagick/ImageMagick/archive/7.1.2-12.tar.gz
         sha256: 521fa7a8c0f664a3f5cf7437cbcc219f12bd6d5fe0c1fb014f212fa145076e60
-        x-checker-data:
-          type: anitya
-          project-id: 1372
-          stable-only: true
-          url-template: https://github.com/ImageMagick/ImageMagick/archive/$version.tar.gz
     cleanup:
       - /bin
       - /etc
@@ -442,15 +405,9 @@ modules:
       - /include
       - /lib/pkgconfig
     sources:
-      - type: git
-        url: https://github.com/breakfastquay/rubberband.git
-        #mirror-urls:
-        #  - https://hg.sr.ht/~breakfastquay/rubberband
-        tag: v4.0.0
-        commit: 1d95888bec3ae0a17c0c4af791810d5a63f6bc35
-        x-checker-data:
-          type: git
-          tag-pattern: ^v([\d.]+)$
+      - type: archive
+        url: https://github.com/breakfastquay/rubberband/archive/refs/tags/v4.0.0.tar.gz
+        sha256: 24300f48a8014b7c863b573a9647e61b1b19b37875e2cdd92005e64c6424d266
 
   - name: mujs
     buildsystem: autotools
@@ -475,6 +432,15 @@ modules:
           tag-query: .[0].name
           version-query: $tag
           timestamp-query: .[0].commit.created
+      # - type: archive
+      #   url: https://codeberg.org/ccxvii/mujs/archive/1.3.8.tar.gz
+      #   sha256: 10e8548033924ada0828a821777371861ea3e127d472e8423ad87426118291d9
+      #   x-checker-data:
+      #     type: json
+      #     url: https://codeberg.org/api/v1/repos/ccxvii/mujs/tags
+      #     tag-query: .[0].name
+      #     version-query: $tag
+      #     timestamp-query: .[0].commit.created
 
       # The unicode character database files are downloaded in the makefile rules `UnicodeData.txt` and `SpecialCasing.txt`.
       # This does not work with flatpak because there is no network access during the build step.
@@ -522,14 +488,10 @@ modules:
       - /lib/pkgconfig
       - /share/man
     sources:
-      - type: git
-        url: https://bitbucket.org/multicoreware/x265_git.git
-        tag: '4.0'
-        commit: 6318f223684118a2c71f67f3f4633a9e35046b00
-        # build is failing with 4.1 will enable with 4.2
-        #x-checker-data:
-        #  type: git
-        #  tag-pattern: ^([\d.]+)$
+      - type: archive
+        url: https://bitbucket.org/multicoreware/x265_git/get/1d117bed4747758b51bd2c124d738527e30392cb.tar.gz
+        # tag 4.0
+        sha256: 7d23cdcdbd510728202c0dfbf7c51eda26a395de2096c504c2b10d6035711102
 
       # fix cmake build issue
       # https://bitbucket.org/multicoreware/x265_git/commits/b354c009a60bcd6d7fc04014e200a1ee9c45c167
@@ -541,13 +503,9 @@ modules:
     config-opts:
       - -DBUILD_TESTS=OFF
     sources:
-      - type: git
-        commit: 7a0c07111a3d7230ec534e08925c24a7525f33c0
-        tag: v1.3.4
-        url: https://github.com/hoene/libmysofa.git
-        x-checker-data:
-          type: git
-          tag-pattern: ^v([\d.]+)$
+      - type: archive
+        url: https://github.com/hoene/libmysofa/archive/refs/tags/v1.3.4.tar.gz
+        sha256: 64c661f75ef39edf68bfc3a28403d2b5a0bd251d0b9f5d021ed6f7917867fb37
 
   - name: libbs2b
     buildsystem: autotools
@@ -609,15 +567,9 @@ modules:
       - --enable-vaapi
 
     sources:
-      - type: git
-        url: https://github.com/FFmpeg/FFmpeg.git
-        #mirror-urls:
-        #  - https://git.ffmpeg.org/ffmpeg.git
-        commit: 894da5ca7d742e4429ffb2af534fcda0103ef593
-        tag: n8.0.1
-        x-checker-data:
-          type: git
-          tag-pattern: ^n([\d.]{3,7})$
+      - type: archive
+        url: https://github.com/FFmpeg/FFmpeg/archive/refs/tags/n8.0.1.tar.gz
+        sha256: 679aa13a19415d5ddab91e580084e3ab20c963c8240001e5cbb955a97bdd81b1
 
   - name: libsixel
     buildsystem: meson
@@ -668,6 +620,9 @@ modules:
         x-checker-data:
           type: git
           tag-pattern: ^v([\d.]+)$
+      # - type: archive
+      #   url: https://github.com/haasn/libplacebo/archive/refs/tags/v7.349.0.tar.gz
+      #   sha256: 627e32439a0b3d2b90368ead7e919f470ee7446c87cc0f7841bbe319b23aa8b1
 
       # fix python error: TypeError: expected an Element, not ElementTree
       # https://code.videolan.org/videolan/libplacebo/-/commit/12509c0f1ee8c22ae163017f0a5e7b8a9d983a17
@@ -752,14 +707,9 @@ modules:
       - mkdir -p /app/etc/mpv
       - echo "screenshot-directory=~/.var/app/com.retro_exo.mpv/Pictures/mpv" > /app/etc/mpv/mpv.conf
     sources:
-      - type: git
-        url: https://github.com/mpv-player/mpv.git
-        tag: v0.41.0
-        commit: 41f6a645068483470267271e1d09966ca3b9f413
-        x-checker-data:
-          type: git
-          tag-pattern: ^v([\d.]+)$
-          is-main-source: true
+      - type: archive
+        url: https://github.com/mpv-player/mpv/archive/refs/tags/v0.41.0.tar.gz
+        sha256: ee21092a5ee427353392360929dc64645c54479aefdb5babc5cfbb5fad626209
 
       # required to build against ffmpeg 8.0
       # https://github.com/mpv-player/mpv/commit/26b29fba02a2782f68e2906f837d21201fc6f1b9
@@ -1148,10 +1098,6 @@ modules:
       - make
       - install -D lib/mpv_inhibit_gnome.so /app/etc/mpv/scripts
     sources:
-      - type: git
-        url: https://github.com/Guldoman/mpv_inhibit_gnome.git
-        tag: v0.1.3
-        commit: 9069be0f15fa2c222d78a183d4aa1477d8a8f2cd
-        x-checker-data:
-          type: git
-          tag-pattern: ^v([\d.]+)$
+      - type: archive
+        url: https://github.com/Guldoman/mpv_inhibit_gnome/archive/refs/tags/v0.1.3.tar.gz
+        sha256: 185668823892c6c124ce60068209a1d15da1eefcbef775dcbc90d91c53403f94

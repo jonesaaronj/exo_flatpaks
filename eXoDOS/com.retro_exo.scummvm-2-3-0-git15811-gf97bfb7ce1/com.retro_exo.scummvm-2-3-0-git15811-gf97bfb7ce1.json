@@ -28,10 +28,10 @@
         "/share/appdata"
     ],
     "modules": [
-        "shared-modules/libmad/libmad.json",
-        "shared-modules/glu/glu-9.json",
-        "shared-modules/glew/glew.json",
-        "shared-modules/linux-audio/fluidsynth2.json",
+        "../../shared-modules/libmad/libmad.json",
+        "../../shared-modules/glu/glu-9.json",
+        "../../shared-modules/glew/glew.json",
+        "../../shared-modules/linux-audio/fluidsynth2.json",
         {
             "name": "fluid_soundfont",
             "sources": [
