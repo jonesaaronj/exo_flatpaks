@@ -17,7 +17,7 @@ sources:
       name: PyMuPDF
 
 modules:
-  - shared-modules/glu/glu-9.json
+  - ../../shared-modules/glu/glu-9.json
   - name: python3-clang
     cleanup: ['*']
     buildsystem: simple

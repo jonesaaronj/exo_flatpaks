@@ -44,10 +44,9 @@ modules:
       - /lib/pkgconfig
       - /include
     sources:
-      - type: git
-        url: https://github.com/zdoom/gzdoom.git
-        tag: g4.11.3
-        commit: 6ce809efe2902e43ceaa7031b875225d3a0367de
+      - type: archive
+        url: https://github.com/ZDoom/gzdoom/archive/refs/tags/g4.11.3.tar.gz
+        sha256: 5943dba50da20ff94f1fcc415132672d42a15917c571b1c2b7ceefe14935f5d5
         x-checker-data:
           type: anitya
           project-id: 17531
@@ -56,8 +55,8 @@ modules:
       - type: patch
         path: description.patch
     modules:
-      - shared-modules/linux-audio/libinstpatch.json
-      - shared-modules/linux-audio/fluidsynth2.json
+      - ../../shared-modules/linux-audio/libinstpatch.json
+      - ../../shared-modules/linux-audio/fluidsynth2.json
       - name: libsndfile
         buildsystem: cmake-ninja
         sources:

@@ -23,16 +23,19 @@
         "/lib/pkgconfig",
         "/share/aclocal",
         "/share/man",
-        "*.la", "*.a"
+        "*.la",
+        "*.a"
     ],
     "modules": [
-        "shared-modules/glu/glu-9.json",
-        "shared-modules/SDL/SDL-1.2.15.json",
-        "shared-modules/SDL/SDL_net-1.2.8.json",
+        "../../shared-modules/glu/glu-9.json",
+        "../../shared-modules/SDL/SDL-1.2.15.json",
+        "../../shared-modules/SDL/SDL_net-1.2.8.json",
         {
             "name": "SDL_sound",
             "rm-configure": true,
-            "config-opts": ["--disable-static"],
+            "config-opts": [
+                "--disable-static"
+            ],
             "sources": [
                 {
                     "type": "archive",
@@ -41,7 +44,9 @@
                 },
                 {
                     "type": "script",
-                    "commands": [ "AUTOMAKE=\"automake --foreign\" autoreconf -fiv" ],
+                    "commands": [
+                        "AUTOMAKE=\"automake --foreign\" autoreconf -fiv"
+                    ],
                     "dest-filename": "autogen.sh"
                 }
             ]
@@ -52,6 +57,9 @@
                 {
                     "type": "archive",
                     "url": "https://github.com/hiddenasbestos/dosbox-gridc/archive/refs/tags/GC-v4.3.1.tar.gz",
+		    "mirror-urls": [
+                        "https://github.com/jonesaaronj/exo_flatpaks/releases/download/source_bundles/dosbox-gridc-GC-v4.3.1.tar.gz"
+		    ],
                     "sha256": "32c6e9b1d70ddb8f468fa948a081fd63e0793dd41b7fbc95492f70c249aa86a6"
                 },
                 {

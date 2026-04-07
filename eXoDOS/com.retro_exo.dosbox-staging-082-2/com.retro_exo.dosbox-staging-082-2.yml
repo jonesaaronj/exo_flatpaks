@@ -33,7 +33,7 @@ cleanup-commands:
 modules:
 
   # Build FluidSynth for General MIDI emulation
-  - shared-modules/linux-audio/fluidsynth2.json
+  - ../../shared-modules/linux-audio/fluidsynth2.json
 
   # Build iir1 DSP filter lib
   - name: iir1

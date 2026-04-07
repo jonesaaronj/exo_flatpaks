@@ -31,10 +31,10 @@ cleanup:
 modules:
 
   # Build Mesa GLU
-  - "shared-modules/glu/glu-9.json"
+  - "../../shared-modules/glu/glu-9.json"
 
   # Build FluidSynth for General MIDI emulation
-  - "shared-modules/linux-audio/fluidsynth2.json"
+  - "../../shared-modules/linux-audio/fluidsynth2.json"
 
   # Build libslirp for TCP/IP networking
   - name: libslirp
@@ -58,9 +58,9 @@ modules:
       - --enable-core-inline
       - --enable-sdl2
     sources:
-      - type: git
-        url: https://github.com/joncampbell123/dosbox-x
-        tag: "dosbox-x-v2024.07.01"
+      - type: archive
+        url: https://github.com/joncampbell123/dosbox-x/archive/refs/tags/dosbox-x-v2024.07.01.tar.gz
+        sha256: 23462a3398303f8558e86973af9ba5d3d6d53bdaf324ec749610f2baf1dd449b
     x-checker-data:
       type: anitya
       project-id: 242383

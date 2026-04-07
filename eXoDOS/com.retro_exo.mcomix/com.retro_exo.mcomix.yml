@@ -39,13 +39,10 @@ modules:
       - install -Dm755 CPP/7zip/Bundles/Alone2/b/g/7zz   $FLATPAK_DEST/bin/7z
       - install -Dm755 CPP/7zip/Bundles/SFXCon/b/g/7zCon $FLATPAK_DEST/bin/7zCon.sfx
     sources:
-      - type: git
-        url: https://github.com/ip7z/7zip.git
+      - type: archive
+        url: https://github.com/ip7z/7zip/archive/refs/tags/26.00.tar.gz
         tag: '26.00'
-        commit: 839151eaaad24771892afaae6bac690e31e58384
-        x-checker-data:
-          type: git
-          tag-pattern: ^([\d.]+)$
+        sha256: 07eafed75d661282d402dc2a3edf17e1dbb36fb813f4fbf5a2bad4f6b722aed5
 
   - name: unrar
     no-autogen: true

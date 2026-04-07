@@ -31,7 +31,7 @@
         "/share/appdata"
     ],
     "modules": [
-        "shared-modules/intltool/intltool-0.51.json",
+        "../../shared-modules/intltool/intltool-0.51.json",
         {
             "name": "boost",
             "buildsystem": "simple",
@@ -47,8 +47,8 @@
             "sources": [
                 {
                     "type": "archive",
-                    "url": "https://downloads.sourceforge.net/project/boost/boost/1.80.0/boost_1_80_0.tar.bz2",
-                    "sha256": "1e19565d82e43bc59209a168f5ac899d3ba471d55c7610c677d4ccf2c9c500c0"
+                    "url": "https://downloads.sourceforge.net/project/boost/boost/1.90.0/boost_1_90_0.tar.bz2",
+                    "sha256": "49551aff3b22cbc5c5a9ed3dbc92f0e23ea50a0f7325b0d198b705e8ee3fc305"
                 }
             ]
         },
@@ -92,10 +92,9 @@
             ],
             "sources": [
                 {
-                    "type": "git",
-                    "url": "https://github.com/caolanm/libwmf.git",
-                    "tag": "v0.2.13",
-                    "commit": "9e4737f2293c0d127bda92e5b01896df10571424"
+                    "type": "archive",
+                    "url": "https://github.com/caolanm/libwmf/archive/refs/tags/v0.2.14.tar.gz",
+                    "sha256": "dea2a07ed27fc041a9b2901dc9d12f0d68b76cee6578df955a559b340c32a86c"
                 },
                 {
                     "type": "shell",
@@ -116,10 +115,9 @@
             ],
             "sources": [
                 {
-                    "type": "git",
-                    "url": "https://github.com/AbiWord/wv.git",
-                    "tag": "wv-1-2-9",
-                    "commit": "30692affae5ee38f4804e1621e10e1f4f58d3fd3"
+                    "type": "archive",
+                    "url": "https://github.com/AbiWord/wv/archive/refs/tags/wv-1-2-9.tar.gz",
+                    "sha256": "effe7a2b5b81a3707c60894e7799f7c086fdec76549eb80c1e8fb835b873d2c9"
                 },
                 {
                     "type": "shell",
@@ -144,10 +142,9 @@
             ],
             "sources": [
                 {
-                    "type": "git",
-                    "url": "https://github.com/AbiWord/link-grammar.git",
-                    "tag": "link-grammar-5.3.11",
-                    "commit": "48fd63ebfeb570b418e1068ed434c8b17bf743f2"
+                    "type": "archive",
+                    "url": "https://github.com/AbiWord/link-grammar/archive/refs/tags/link-grammar-5.3.11.tar.gz",
+                    "sha256": "3c9634289b6e74b59336b97265169b850efa2575174b338bbfbe1354b5606d06"
                 }
             ]
         },
@@ -188,8 +185,8 @@
             "sources": [
                 {
                     "type": "archive",
-                    "url": "https://download.gnome.org/sources/goffice/0.10/goffice-0.10.59.tar.xz",
-                    "sha256": "b08f7173325594b71fbbea476a30b5b3120c3dadff5c0a26d140e4e524916622",
+                    "url": "https://download.gnome.org/sources/goffice/0.10/goffice-0.10.60.tar.xz",
+                    "sha256": "01154338cbffac172fc53338ebb9d527c821ffc21985a2ccfa84923ee6b761c5",
                     "x-checker-data": {
                         "type": "gnome",
                         "name": "goffice",
@@ -215,8 +212,8 @@
             "sources": [
                 {
                     "type": "archive",
-                    "url": "https://downloads.sourceforge.net/project/libwpd/librevenge/librevenge-0.0.4/librevenge-0.0.4.tar.xz",
-                    "sha256": "933f0729f04267cc354b9a02bc3e9afefa5512a3bdd0b45f159ee14a3e3347b2"
+                    "url": "https://downloads.sourceforge.net/project/libwpd/librevenge/librevenge-0.0.5/librevenge-0.0.5.tar.xz",
+                    "sha256": "106d0c44bb6408b1348b9e0465666fa83b816177665a22cd017e886c1aaeeb34"
                 }
             ]
         },
@@ -269,8 +266,8 @@
             "sources": [
                 {
                     "type": "archive",
-                    "url": "https://mirrors.ibiblio.org/gnu/ed/ed-1.22.tar.lz",
-                    "sha256": "7eb22c30a99dcdb50a8630ef7ff3e4642491ac4f8cd1aa9f3182264df4f4ad08"
+                    "url": "https://mirrors.ibiblio.org/gnu/ed/ed-1.22.5.tar.lz",
+                    "sha256": "56e107ddc2f29dad6690376c15bf9751509e1ee3b8241710e44edbe5c3a158cc"
                 }
             ]
         },
@@ -282,8 +279,8 @@
             "sources": [
                 {
                     "type": "archive",
-                    "url": "https://ftp.gnu.org/gnu/bc/bc-1.07.1.tar.gz",
-                    "sha256": "62adfca89b0a1c0164c2cdca59ca210c1d44c3ffc46daf9931cf4942664cb02a"
+                    "url": "https://ftp.gnu.org/gnu/bc/bc-1.08.2.tar.gz",
+                    "sha256": "ae470fec429775653e042015edc928d07c8c3b2fc59765172a330d3d87785f86"
                 }
             ]
         },
@@ -372,10 +369,9 @@
             ],
             "sources": [
                 {
-                    "type": "git",
-                    "url": "https://github.com/AbiWord/enchant.git",
-                    "//": "tags/enchant-1-6-0",
-                    "commit": "02f3b4a85560b93d9a0aa593ef70e5496d0f029c"
+                    "type": "archive",
+                    "url": "https://github.com/rrthomas/enchant/archive/refs/tags/enchant-1-6-1.tar.gz",
+                    "sha256": "ed2b11211a571ab5f963debf4c3bf3fc46541bb9cbb441b2997bd871ba8618d4"
                 },
                 {
                     "type": "shell",
@@ -398,10 +394,9 @@
             ],
             "sources": [
                 {
-                    "type": "git",
-                    "url": "https://gitlab.gnome.org/World/AbiWord.git",
-                    "tag": "release-3.0.7",
-                    "commit": "3114dd2d8b0e96323000af09e86eaf39caa3040f"
+                    "type": "archive",
+                    "url": "https://gitlab.gnome.org/World/AbiWord/-/archive/release-3.0.8/AbiWord-release-3.0.8.tar.gz?ref_type=tags",
+                    "sha256": "7c490e46f0a6143f84d5c7e3fed246f34486ad70cd55f162c792827607cd7e9a"
                 }
             ]
         }

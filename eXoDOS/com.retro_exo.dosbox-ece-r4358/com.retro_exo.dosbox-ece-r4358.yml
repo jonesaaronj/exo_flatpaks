@@ -26,17 +26,17 @@ cleanup:
   - '/share/doc'
 
 modules:
-  - "shared-modules/glu/glu-9.json"
-  - "shared-modules/glew/glew.json"  
-  - "shared-modules/SDL/SDL-1.2.15.json"
-  - "shared-modules/SDL/SDL_net-1.2.8.json"
-  - "shared-modules/linux-audio/fluidsynth2.json"
+  - "../../shared-modules/glu/glu-9.json"
+  - "../../shared-modules/glew/glew.json"  
+  - "../../shared-modules/SDL/SDL-1.2.15.json"
+  - "../../shared-modules/SDL/SDL_net-1.2.8.json"
+  - "../../shared-modules/linux-audio/fluidsynth2.json"
   - name: open-glide
     buildsystem: autotools
     sources:
-      - type: git
-        url: https://github.com/voyageur/openglide.git
-        commit: 1ecc60a83d2255bb9ce8a3e53a5c6bcc7dce44b1   
+      - type: archive
+        url: https://github.com/voyageur/openglide/archive/refs/tags/last-cvs.tar.gz
+        sha256: 23499f970786dad0ead69d89427ab56f15daace186379566ee991f4517ab8223
   - name: mt32emu
     buildsystem: cmake-ninja
     config-opts:
