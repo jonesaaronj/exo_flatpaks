@@ -5,7 +5,9 @@ run_command () {
     eval "$1"
 }
 
-for dir in "${1%/}"/*; do
+arch="${1}"
+
+for dir in "${2%/}"/*; do
 
     dir="${dir%/}"
     pkg="${dir##*/}"
@@ -13,10 +15,15 @@ for dir in "${1%/}"/*; do
     echo "pkg: ${pkg}"
 
     if [[ "$dir" == *"com.retro_exo"* ]]; then
+        run_command "rm -rf ${dir}/${pkg}_${arch}"
+        #run_command "rm -rf ${dir}/.flatpak-builder"
+        run_command "rm -rf ${dir}/export_${arch}"
+        run_command "rm ${dir}/${pkg}.${arch}.flatpak"
+
         run_command "rm -rf ${dir}/${pkg}"
-        run_command "rm -rf ${dir}/.flatpak-builder"
+        #run_command "rm -rf ${dir}/.flatpak-builder"
         run_command "rm -rf ${dir}/export"
+        run_command "rm -rf ${dir}/export_x86_64"
         run_command "rm ${dir}/${pkg}.flatpak"
     fi
 done
-
