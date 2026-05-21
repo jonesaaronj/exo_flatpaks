@@ -13,7 +13,8 @@ popd () {
     command popd "$@" > /dev/null
 }
 
-dir="${1%/}"
+arch="${1}"
+dir="${2%/}"
 pkg="${dir##*/}"
 echo "dir: ${dir}"
 echo "pkg: ${pkg}"
@@ -25,9 +26,8 @@ pushd $dir
 [ -f "${pkg}.yml" ] && manifest="${pkg}.yml" 
 echo "using manifest: $manifest"
 
-run_command "flatpak run org.flatpak.Builder --user --install-deps-from=flathub --force-clean ${pkg} ${manifest}"
-run_command "flatpak build-export export ${pkg}"
-run_command "flatpak build-bundle export ${pkg}.flatpak ${pkg} --runtime-repo=https://flathub.org/repo/flathub.flatpakrepo"
+run_command "flatpak run org.flatpak.Builder --user --install-deps-from=flathub --force-clean --arch=${arch} ${pkg}_${arch} ${manifest}"
+run_command "flatpak build-export --arch=${arch} export_${arch} ${pkg}_${arch}"
+run_command "flatpak build-bundle --arch=${arch} export_${arch} ${pkg}.${arch}.flatpak ${pkg} --runtime-repo=https://flathub.org/repo/flathub.flatpakrepo"
 
 popd
-

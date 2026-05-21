@@ -79,9 +79,9 @@ modules:
     buildsystem: simple
     sources:
       - type: file
-        path: ../shared/scummvm_wrapper/scummvm_wrapper.py
+        path: ../../shared/scummvm_wrapper/scummvm_wrapper.py
       - type: file
-        path: ../shared/scummvm_wrapper/setup.py
+        path: ../../shared/scummvm_wrapper/setup.py
     build-commands:
       - python3 -mpip install . --no-build-isolation --prefix=/app --no-index --find-links .
 

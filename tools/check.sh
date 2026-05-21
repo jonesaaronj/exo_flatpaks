@@ -1,15 +1,15 @@
 #!/bin/bash
 
-for dir in "${1%/}"/*; do
+arch="${1}"
+for dir in "${2%/}"/*; do
     dir=${dir%/}
     pkg="${dir##*/}"
     if [[ "$dir" == *"com.retro_exo"* ]]; then
-        if ! [ -d "${dir}/export" ]; then
-            echo "${pkg} missing export"
+        if ! [ -d "${dir}/export_${arch}" ]; then
+            echo "${pkg} missing export_${arch}"
         fi
-        if ! [ -f "${dir}/${pkg}.flatpak" ]; then
-            echo "${pkg} missing flatpak"
+        if ! [ -f "${dir}/${pkg}.${arch}.flatpak" ]; then
+            echo "${pkg} missing ${arch}.flatpak"
         fi
     fi
 done
-

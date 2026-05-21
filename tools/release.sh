@@ -13,12 +13,14 @@ popd () {
     command popd "$@" > /dev/null
 }
 
-dir="${1%/}"
-pkg="${2}"
-release="${3%/}"
+arch="${1}"
+dir="${2%/}"
+pkg="${3}"
+release="${4%/}"
 echo "dir: ${dir}"
 echo "pkg: ${pkg}"
 echo "release: ${release}"
 
 run_command "mkdir -p ${release}"
-run_command "cp -f ${dir}/${pkg}.flatpak ${release}/${pkg}.flatpak"
+
+run_command "cp -f ${dir}/${pkg}.${arch}.flatpak ${release}/${pkg}.${arch}.flatpak"
