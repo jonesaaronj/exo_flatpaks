@@ -1,0 +1,58 @@
+id: com.retro_exo.wine
+default-branch: stable-25.08
+sdk: org.freedesktop.Sdk
+runtime: org.freedesktop.Platform
+runtime-version: &runtime-version '25.08'
+command: start-wine
+
+finish-args:
+  - --share=ipc
+  - --socket=x11
+  - --socket=wayland
+  - --socket=pulseaudio
+  - --device=all
+  - --share=network
+  - --allow=multiarch
+  - --allow=devel
+  - --system-talk-name=org.freedesktop.UDisks2
+  - --filesystem=xdg-desktop
+  - --filesystem=xdg-documents
+  - --filesystem=xdg-pictures
+  - --filesystem=xdg-music
+  - --filesystem=xdg-videos
+  - --filesystem=xdg-download
+  - --filesystem=host
+  - --env=WINEPREFIX=/var/data/wine
+
+modules:
+  - name: box64
+    buildsystem: cmake
+    config-opts:
+      - -DARM_DYNAREC=ON
+      - -DCMAKE_BUILD_TYPE=RelWithDebInfo
+    sources:
+      - type: git
+        url: https://github.com/ptitSeb/box64.git
+        branch: main
+      - type: shell
+        commands:
+          - sed -i 's|DESTINATION /etc|DESTINATION etc|g' CMakeLists.txt
+          - sed -i 's|/usr/lib/box64-x86_64-linux-gnu|lib/box64-x86_64-linux-gnu|g' CMakeLists.txt
+
+  - name: wine-amd64-wow64
+    buildsystem: simple
+    build-commands:
+      - mkdir -p /app/wine
+      - cp -r * /app/wine/
+    sources:
+      - type: archive
+        url: https://github.com/Kron4ek/Wine-Builds/releases/download/11.10/wine-11.10-amd64-wow64.tar.xz
+        sha256: 14792da5d655657f81c5a2968d43ed137adcf4a14c5db036d048f54cf4c632f9
+
+  - name: entrypoint
+    buildsystem: simple
+    build-commands:
+      - install -D -m 755 start-wine.sh /app/bin/start-wine
+    sources:
+      - type: file
+        path: start-wine.sh
