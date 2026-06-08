@@ -20,10 +20,12 @@ echo "dir: ${dir}"
 echo "pkg: ${pkg}"
 
 pushd $dir
-
-[ -f "${pkg}.json" ] && manifest="${pkg}.json" 
-[ -f "${pkg}.yaml" ] && manifest="${pkg}.yaml" 
-[ -f "${pkg}.yml" ] && manifest="${pkg}.yml" 
+[ -f "${pkg}.${arch}.json" ] && manifest="${pkg}.${arch}.json"
+[ -f "${pkg}.${arch}.yaml" ] && manifest="${pkg}.${arch}.yaml"
+[ -f "${pkg}.${arch}.yml" ] && manifest="${pkg}.${arch}.yml"
+[ -f "${pkg}.json" ] && manifest="${pkg}.json"
+[ -f "${pkg}.yaml" ] && manifest="${pkg}.yaml"
+[ -f "${pkg}.yml" ] && manifest="${pkg}.yml"
 echo "using manifest: $manifest"
 
 run_command "flatpak run org.flatpak.Builder --user --install-deps-from=flathub --force-clean --arch=${arch} ${pkg}_${arch} ${manifest}"

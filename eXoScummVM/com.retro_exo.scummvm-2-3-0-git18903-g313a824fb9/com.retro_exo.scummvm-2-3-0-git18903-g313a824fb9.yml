@@ -22,9 +22,6 @@ cleanup:
   - /share/icons
   - /share/metainfo
   - /share/appdata
-build-options:
-  env:
-    CXXFLAGS: "-DFORBIDDEN_SYMBOL_ALLOW_ALL"
 modules:
   - ../../shared-modules/libmad/libmad.json
   - ../../shared-modules/glu/glu-9.json
@@ -97,6 +94,11 @@ modules:
           type: anitya
           project-id: 4775
           url-template: https://downloads.scummvm.org/frs/scummvm/$version/scummvm-$version.tar.bz2
+    build-options:
+      arch:
+        aarch64:
+          env:
+            CXXFLAGS: "-DFORBIDDEN_SYMBOL_ALLOW_ALL"
     config-opts:
       - --enable-release
       - --disable-debug
