@@ -1,4 +1,10 @@
 flatpak remote-add --user --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
 flatpak install --user flathub org.flatpak.Builder
+
 git submodule update --init --recursive
-gh release upload flatpaks_20260521 ./release/**/*.flatpak  --clobber
+
+find ./release -name '*.flatpak' -exec cp {} ./release_all/ \;
+gh release upload flatpaks_20260605 ./release_all/*.flatpak  --clobber
+
+mega-login
+mega-put zip/eXo*.* /

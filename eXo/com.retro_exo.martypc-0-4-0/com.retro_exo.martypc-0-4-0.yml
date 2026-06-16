@@ -1,0 +1,55 @@
+app-id: com.retro_exo.martypc-0-4-0
+runtime: org.freedesktop.Platform
+runtime-version: '25.08'
+sdk: org.freedesktop.Sdk
+sdk-extensions:
+  - org.freedesktop.Sdk.Extension.rust-nightly
+command: martypc
+
+finish-args:
+  # Graphics Acceleration (Required for wgpu/OpenGL)
+  - --device=dri
+  - --socket=wayland
+  - --socket=x11
+  # Audio (ALSA via PulseAudio/PipeWire)
+  - --socket=pulseaudio
+  # File access to load external Floppy/HDD images
+  - --filesystem=host
+
+modules:
+  - name: martypc
+    build-options:
+      build-args:
+        - --share=network
+      append-path: /usr/lib/sdk/rust-nightly/bin
+      env:
+        RUSTFLAGS: "-C linker=cc"
+
+    buildsystem: simple
+    build-commands:
+      # Build the release binary
+      - cargo build --release
+
+      # Prepare destination directories
+      - install -d /app/bin
+      - install -d /app/libexec/martypc
+
+      # Copy binary to hidden libexec directory
+      - install -m755 target/release/martypc /app/libexec/martypc/martypc
+
+      # Copy configuration and system assets next to the binary
+      - cp -r install/configs /app/libexec/martypc/
+
+      # Create a wrapper launcher script so MartyPC executes within its resource directory
+      - |
+        cat << 'EOF' > /app/bin/martypc
+        #!/bin/sh
+        cd /app/libexec/martypc
+        exec ./martypc "$@"
+        EOF
+      - chmod +x /app/bin/martypc
+
+    sources:
+      - type: archive
+        url: https://github.com/dbalsom/martypc/archive/refs/tags/0.4.0.tar.gz
+        sha256: 0cb8c4ab76913957de92459999c6227618ca4deb293a33f2102a569b2d41fb97

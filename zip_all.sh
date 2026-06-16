@@ -1,6 +1,7 @@
 #!/bin/bash
 
 mkdir -p zip
+
 for dir in ./release/*/; do    
     dir=${dir%/}
     echo "Zipping ${dir}"
