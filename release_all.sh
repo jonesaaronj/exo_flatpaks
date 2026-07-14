@@ -1,6 +1,6 @@
 #!/bin/bash
 
-dirs=("eXo" "eXoDemoScene" "eXoDOS" "eXoScummVM" "eXoWin9x")
+dirs=("eXoShared" "eXoDemoScene" "eXoDOS" "eXoScummVM" "eXoWin9x")
 arches=("x86_64" "aarch64")
 
 for dir in "${dirs[@]}"; do    

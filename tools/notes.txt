@@ -3,6 +3,8 @@ flatpak install --user flathub org.flatpak.Builder
 
 git submodule update --init --recursive
 
+git submodule update --remote --merge
+
 find ./release -name '*.flatpak' -exec cp {} ./release_all/ \;
 gh release upload flatpaks_20260605 ./release_all/*.flatpak  --clobber
 
