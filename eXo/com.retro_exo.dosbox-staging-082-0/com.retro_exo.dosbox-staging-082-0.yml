@@ -112,7 +112,26 @@ modules:
     config-opts:
       - -Dbuildtype=release
       - -Ddefault_library=shared
-      - -Duse_zlib_ng=sse2,ssse3
+    build-options:
+      arch:
+        x86_64:
+          config-opts:
+            # x86-only SIMD flags; keep these off the aarch64 build
+            - -Duse_zlib_ng=sse2,ssse3
+        aarch64:
+          config-opts:
+            - -Duse_zlib_ng=neon
+            # Bake in a 64 KiB page size so the dynamic recompiler (dynrec)
+            # works on every aarch64 kernel page size in the wild: 4K
+            # (most distros), 16K (Raspberry Pi 5 default kernel, Apple
+            # Silicon/Asahi), and 64K (RHEL/CentOS aarch64). 65536 is an
+            # exact multiple of all of them, so mprotect() alignment is
+            # always valid. Without this, meson bakes in the BUILD
+            # machine's 4K page size; on a 16K/64K-page host the JIT
+            # cache mprotect() calls then fail silently (asserts are
+            # stripped by -DNDEBUG) and games fall back to interpreter
+            # speed (~2-3 fps).
+            - -Dpagesize=65536
     sources:
       - type: archive
         url: https://github.com/dosbox-staging/dosbox-staging/archive/refs/tags/v0.82.0.tar.gz

@@ -71,8 +71,8 @@
             "sources": [
                 {
                     "type": "archive",
-                    "url": "https://download.gnome.org/sources/goffice/0.10/goffice-0.10.60.tar.xz",
-                    "sha256": "01154338cbffac172fc53338ebb9d527c821ffc21985a2ccfa84923ee6b761c5",
+                    "url": "https://download.gnome.org/sources/goffice/0.10/goffice-0.10.61.tar.xz",
+                    "sha256": "558597fd9ca59b93ff562750218d1e7ea8ec3c8d0ed6a5cc096aa715ef909a15",
                     "x-checker-data": {
                         "type": "gnome",
                         "name": "goffice",
@@ -81,6 +81,21 @@
                         },
                         "stable-only": true
                     }
+                },
+                {
+                    "type": "file",
+                    "path": "patches/goffice-image-sniff.py"
+                },
+                {
+                    "type": "file",
+                    "path": "patches/goffice-pixbuf-close.py"
+                },
+                {
+                    "type": "shell",
+                    "commands": [
+                        "python3 goffice-image-sniff.py goffice/utils/go-image.c",
+                        "python3 goffice-pixbuf-close.py goffice/utils/go-pixbuf.c"
+                    ]
                 }
             ]
         },
@@ -175,8 +190,8 @@
             "sources": [
                 {
                     "type": "archive",
-                    "url": "https://download.gnome.org/sources/gnumeric/1.12/gnumeric-1.12.60.tar.xz",
-                    "sha256": "bb02feb286062805564438534e1fea459f97cebac8a090b1a7e47ca251e07467",
+                    "url": "https://download.gnome.org/sources/gnumeric/1.12/gnumeric-1.12.61.tar.xz",
+                    "sha256": "2ac135d856572713c1a408b76b50a59f2a9769ed21f1213446b5af255df20a12",
                     "x-checker-data": {
                         "type": "gnome",
                         "name": "gnumeric",
@@ -186,6 +201,16 @@
                 {
                     "type": "patch",
                     "path": "patches/gnumerica-appstream.patch"
+                },
+                {
+                    "type": "file",
+                    "path": "patches/gnumeric-psiconv-fix.py"
+                },
+                {
+                    "type": "shell",
+                    "commands": [
+                        "python3 gnumeric-psiconv-fix.py plugins/psiconv/psiconv-read.c"
+                    ]
                 }
             ]
         }
