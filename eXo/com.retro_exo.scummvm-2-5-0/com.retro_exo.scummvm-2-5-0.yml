@@ -94,7 +94,10 @@ modules:
           type: anitya
           project-id: 4775
           url-template: https://downloads.scummvm.org/frs/scummvm/$version/scummvm-$version.tar.bz2
+    build-options:
+      cxxflags: "-Wno-template-id-cdtor -fpermissive"
     config-opts:
       - --enable-release
       - --disable-debug
       - --disable-system-dialogs
+      - --enable-all-engines

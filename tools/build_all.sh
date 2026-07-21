@@ -19,8 +19,12 @@ for dir in "${2%/}"/*; do
     echo "release: ${release}"
 
     if [[ "${dir}" == *"com.retro_exo"* ]]; then
-    
+        if [ -f "${dir}/${pkg}.${arch}.flatpak" ]; then
+            echo "${dir}/${pkg}.${arch}.flatpak exists.  Skipping Build"
+            continue
+        fi
+
         $SCRIPT_DIR/build.sh "${arch}" "${dir}"
-        $SCRIPT_DIR/release.sh "${arch}" "${dir}" "${pkg}" "${release}"
+        #$SCRIPT_DIR/release.sh "${arch}" "${dir}" "${pkg}" "${release}"
     fi
 done

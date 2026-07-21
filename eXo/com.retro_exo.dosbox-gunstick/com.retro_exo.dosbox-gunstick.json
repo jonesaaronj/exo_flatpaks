@@ -61,6 +61,17 @@
                     "sha256": "21504391b7c4374ac0cee90fa8c2fe019e0c007f1ce30b9375a68f46236ebd2f"
                 },
                 {
+                    /* Fullscreen lightgun fix: the gun samples absolute SDL
+                       mouse coordinates, but in fullscreen the image is
+                       letterboxed at (sdl.clip.x, sdl.clip.y) — without
+                       subtracting those offsets, clicks sample the wrong
+                       pixel and the gun misses. Windowed mode has zero
+                       offsets, which is why it worked there. Shots into the
+                       black bars now read as dark pixels (a miss). */
+                    "type": "patch",
+                    "path": "lightgun-fullscreen.patch"
+                },
+                {
                     "type": "script",
                     "commands": [
                         "autoreconf -fiv"
