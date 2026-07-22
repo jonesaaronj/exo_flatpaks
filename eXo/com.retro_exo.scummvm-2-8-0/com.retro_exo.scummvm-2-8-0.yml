@@ -75,6 +75,18 @@ modules:
           project-id: 13972
           url-template: https://git.adelielinux.org/community/a52dec/-/archive/v$version/a52dec-v$version.tar.gz
 
+  - name: sonivox
+    buildsystem: cmake-ninja
+    config-opts:
+      - -DBUILD_SONIVOX_STATIC=OFF
+      - -DBUILD_EXAMPLE=OFF
+      - -DBUILD_TESTING=OFF
+    sources:
+      - type: git
+        url: https://github.com/pedrolcl/sonivox.git
+        tag: v3.6.16
+        commit: 198f4f6a840fe3ac6cae2952652a78f0b8f66c9d
+
   - name: scummvm_wrapper
     buildsystem: simple
     sources:
@@ -100,3 +112,4 @@ modules:
       - --enable-release
       - --disable-debug
       - --disable-system-dialogs
+      - --enable-all-engines

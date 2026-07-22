@@ -75,6 +75,48 @@ modules:
           project-id: 13972
           url-template: https://git.adelielinux.org/community/a52dec/-/archive/v$version/a52dec-v$version.tar.gz
 
+  - name: libopenmpt
+    config-opts:
+      - --disable-openmpt123
+      - --disable-examples
+      - --disable-tests
+      - --disable-doxygen-doc
+      - --without-portaudio
+      - --without-portaudiocpp
+      - --without-sndfile
+      - --without-flac
+    sources:
+      - type: archive
+        url: https://deb.debian.org/debian/pool/main/libo/libopenmpt/libopenmpt_0.8.7.orig.tar.gz
+        sha256: 275c29ef47be9992f62a35fcc96f7ca05c06d2fd05c9298b8dee9f743f75b089
+
+  - name: libmpcdec
+    build-options:
+      arch:
+        aarch64:
+          config-opts:
+            - --build=aarch64-unknown-linux-gnu
+      cflags: "-fcommon"
+    sources:
+      - type: archive
+        url: http://old-releases.ubuntu.com/ubuntu/pool/main/libm/libmpcdec/libmpcdec_1.2.2.orig.tar.gz
+        sha256: ef7111cecf40dc49fe712dac6020f76c096ed890a02fa6df20c0aa9755146e50
+      - type: shell
+        commands:
+          - cp -f /usr/share/automake-*/config.guess /usr/share/automake-*/config.sub . 2>/dev/null || true
+
+  - name: sonivox
+    buildsystem: cmake-ninja
+    config-opts:
+      - -DBUILD_SONIVOX_STATIC=OFF
+      - -DBUILD_EXAMPLE=OFF
+      - -DBUILD_TESTING=OFF
+    sources:
+      - type: git
+        url: https://github.com/pedrolcl/sonivox.git
+        tag: v3.6.16
+        commit: 198f4f6a840fe3ac6cae2952652a78f0b8f66c9d
+
   - name: scummvm_wrapper
     buildsystem: simple
     sources:
@@ -98,3 +140,4 @@ modules:
       - --enable-release
       - --disable-debug
       - --disable-system-dialogs
+      - --enable-all-engines
