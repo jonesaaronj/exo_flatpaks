@@ -26,9 +26,12 @@ modules:
           - |
             export JAVA_HOME=/app/jre
             export PATH=$JAVA_HOME/bin:$PATH
+            # Fix blank/unrendered Swing content under non-reparenting
+            # Wayland compositors (e.g. labwc/Wayfire on Raspberry Pi OS)
+            export _JAVA_AWT_WM_NONREPARENTING=1
             cd /app/share/openuhs
             exec bash ./OpenUHS.command "$@"
-            
+
 finish-args:
   - --socket=x11
   - --socket=wayland
