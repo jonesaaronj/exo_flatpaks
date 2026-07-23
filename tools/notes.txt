@@ -9,4 +9,4 @@ find ./release -name '*.flatpak' -exec cp {} ./release_all/ \;
 gh release upload flatpaks_20260605 ./release_all/*.flatpak  --clobber
 
 mega-login
-mega-put zip/eXo*.* /
+mega-put zip/eXo*.* / -c

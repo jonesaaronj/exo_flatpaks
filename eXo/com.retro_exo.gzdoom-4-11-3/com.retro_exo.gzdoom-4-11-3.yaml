@@ -17,7 +17,7 @@ finish-args:
   # We redirect the original ~/.config/gzdoom
   - --env=DOOMWADDIR=/app/share/games/doom
   - --persist=.config/gzdoom
-  
+
   # Controller support on SteamDeck and such
   - --device=all
 
@@ -96,12 +96,58 @@ modules:
               stable-only: true
               url-template: https://github.com/zdoom/ZMusic/archive/$version.tar.gz
 
+  # Tiny probe: exits 0 if a GL 3.3 core context can be created, 1 if not.
+  # Uses the runtime's SDL2 and the same driver stack GZDoom itself will use.
+  - name: gl33probe
+    buildsystem: simple
+    sources:
+      - type: inline
+        dest-filename: gl33probe.c
+        contents: |
+          #include <SDL.h>
+          int main(void) {
+              if (SDL_Init(SDL_INIT_VIDEO) != 0) return 2;
+              SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
+              SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
+              SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 3);
+              SDL_Window *w = SDL_CreateWindow("gl33probe", 0, 0, 32, 32,
+                                               SDL_WINDOW_OPENGL | SDL_WINDOW_HIDDEN);
+              if (!w) { SDL_Quit(); return 1; }
+              SDL_GLContext c = SDL_GL_CreateContext(w);
+              if (c) SDL_GL_DeleteContext(c);
+              SDL_DestroyWindow(w);
+              SDL_Quit();
+              return c ? 0 : 1;
+          }
+    build-commands:
+      - gcc -O2 -o gl33probe gl33probe.c $(pkg-config --cflags --libs sdl2)
+      - install -D gl33probe /app/bin/gl33probe
+
   - name: launcher
     buildsystem: simple
     sources:
       - type: script
         commands:
-          - exec gzdoom +fluid_patchset /app/share/games/doom/soundfonts/gzdoom.sf2 "$@"
+          - '# Backend selection (vid_preferbackend: 0=OpenGL 3.3, 1=Vulkan, 2=OpenGL ES)'
+          - '# The backend is pinned per launch based on a GL 3.3 core probe, because'
+          - '# vid_preferbackend is an archived cvar: a run on a sub-3.3 system (e.g.'
+          - '# Raspberry Pi) writes 2 back to the ini, and a shared/portable ini would'
+          - '# otherwise carry that to capable systems. Probe exit 0 -> pin 0 (OpenGL),'
+          - '# exit 1 -> pin 2 (GLES), anything else (e.g. no display) -> leave stock.'
+          - '# GZDOOM_BACKEND, if set (e.g. flatpak override --user'
+          - '# --env=GZDOOM_BACKEND=N), skips the probe and forces backend N. Caller'
+          - '# args still win: "$@" comes after, and later +cvars override earlier ones.'
+          - 'BACKEND_ARGS=""'
+          - 'if [ -n "${GZDOOM_BACKEND:-}" ]; then'
+          - '  BACKEND_ARGS="+vid_preferbackend ${GZDOOM_BACKEND}"'
+          - 'else'
+          - '  /app/bin/gl33probe'
+          - '  case $? in'
+          - '    0) BACKEND_ARGS="+vid_preferbackend 0" ;;'
+          - '    1) BACKEND_ARGS="+vid_preferbackend 2" ;;'
+          - '  esac'
+          - 'fi'
+          - 'exec gzdoom +fluid_patchset /app/share/games/doom/soundfonts/gzdoom.sf2 ${BACKEND_ARGS} "$@"'
         dest-filename: gzdoom.sh
     build-commands:
       - install -D gzdoom.sh /app/bin/gzdoom.sh
