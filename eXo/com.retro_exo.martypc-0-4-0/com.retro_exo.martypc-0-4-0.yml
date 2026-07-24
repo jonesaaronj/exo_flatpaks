@@ -9,7 +9,6 @@ command: martypc
 finish-args:
   # Graphics Acceleration (Required for wgpu/OpenGL)
   - --device=dri
-  - --socket=wayland
   - --socket=x11
   # Audio (ALSA via PulseAudio/PipeWire)
   - --socket=pulseaudio

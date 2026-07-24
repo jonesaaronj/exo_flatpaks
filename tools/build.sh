@@ -29,7 +29,17 @@ pushd $dir
 echo "using manifest: $manifest"
 
 run_command "flatpak run org.flatpak.Builder --user --install-deps-from=flathub --force-clean --arch=${arch} ${pkg}_${arch} ${manifest}"
-run_command "flatpak build-export --arch=${arch} export_${arch} ${pkg}_${arch}"
-run_command "flatpak build-bundle --arch=${arch} export_${arch} ${pkg}.${arch}.flatpak ${pkg} --runtime-repo=https://flathub.org/repo/flathub.flatpakrepo"
+status=$?
+if [ $status -ne 0 ]; then
+    echo "flatpak build failed with exit code $status"
+else
+    run_command "flatpak build-export --arch=${arch} export_${arch} ${pkg}_${arch}"
+    status=$?
+    if [ $status -ne 0 ]; then
+        echo "flatpak export failed with exit code $status"
+    else
+        run_command "flatpak build-bundle --arch=${arch} export_${arch} ${pkg}.${arch}.flatpak ${pkg} --runtime-repo=https://flathub.org/repo/flathub.flatpakrepo"
+    fi
+fi
 
 popd

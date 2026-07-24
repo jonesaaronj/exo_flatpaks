@@ -7,8 +7,7 @@
     "appstream-compose": false,
     "finish-args": [
         "--share=ipc",
-        "--socket=fallback-x11",
-        "--socket=wayland",
+        "--socket=x11",
         "--filesystem=host",
         "--share=network",
         "--talk-name=org.gtk.vfs.*",

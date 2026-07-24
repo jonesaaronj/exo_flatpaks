@@ -10,8 +10,7 @@
     "finish-args": [
         "--share=ipc",
         "--share=network",
-        "--socket=fallback-x11",
-        "--socket=wayland",
+        "--socket=x11",
         "--socket=pulseaudio",
         "--device=dri",
         "--system-talk-name=org.freedesktop.GeoClue2",
@@ -22,7 +21,7 @@
         "--own-name=org.mpris.MediaPlayer2.falkon.*",
         "--filesystem=host"
     ],
-     "cleanup": [
+    "cleanup": [
         "/include",
         "/lib/cmake",
         "/lib/pkgconfig",

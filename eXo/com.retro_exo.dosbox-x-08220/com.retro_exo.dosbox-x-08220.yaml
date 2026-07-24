@@ -7,11 +7,11 @@ sdk: org.freedesktop.Sdk
 command: dosbox-x
 appstream-compose: false
 
-finish-args:         # flatpak permissions
-  - --device=all     # needed for OpenGL, gamepads and serial/parallel
-  - --share=ipc      # needed for X11
-  - --share=network  # Needed for IPX and serial over TCP/IP
-  - --socket=x11     # default to X11, as Gnome does not provide SSD
+finish-args:
+  - --device=all
+  - --share=ipc
+  - --share=network
+  - --socket=x11
   - --socket=pulseaudio
   - --filesystem=host
 

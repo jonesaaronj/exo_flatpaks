@@ -34,7 +34,6 @@ modules:
 
 finish-args:
   - --socket=x11
-  - --socket=wayland
   - --share=ipc
   - --share=network
   - --socket=pulseaudio

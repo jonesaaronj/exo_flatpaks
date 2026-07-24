@@ -5,8 +5,7 @@ sdk: org.gnome.Sdk
 command: zenity
 finish-args:
   - --share=ipc
-  - --socket=fallback-x11
-  - --socket=wayland
+  - --socket=x11
   - --filesystem=host
   - --env=GTK_THEME=Adwaita:dark
 

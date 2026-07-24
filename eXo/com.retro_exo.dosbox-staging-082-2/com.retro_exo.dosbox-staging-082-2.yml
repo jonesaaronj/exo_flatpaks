@@ -12,11 +12,10 @@ build_options:
   cxxflags: -O3
 
 finish-args:
-  - --device=all          # we need OpenGL and controller access
-  - --share=network       # IPX, libslirp and serial port emulation over UDP
-  - --socket=fallback-x11 # X11 output support
-  - --socket=wayland      # Wayland output support
-  - --share=ipc           # necessary for x11
+  - --device=all
+  - --share=network
+  - --socket=x11
+  - --share=ipc
   - --socket=pulseaudio
   - --filesystem=host
   - --filesystem=xdg-run/pipewire-0:ro
