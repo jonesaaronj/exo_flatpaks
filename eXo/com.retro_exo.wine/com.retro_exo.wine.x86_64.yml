@@ -9,7 +9,6 @@ x-gl-merge-dirs: &gl-merge-dirs vulkan/icd.d;glvnd/egl_vendor.d;egl/egl_external
 finish-args:
   - --share=ipc
   - --socket=x11
-  - --socket=wayland
   - --device=all
   - --socket=pulseaudio
   - --share=network

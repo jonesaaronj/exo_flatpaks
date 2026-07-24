@@ -8,7 +8,6 @@ command: start-wine
 finish-args:
   - --share=ipc
   - --socket=x11
-  - --socket=wayland
   - --socket=pulseaudio
   - --device=all
   - --share=network

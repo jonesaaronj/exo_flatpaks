@@ -6,8 +6,7 @@ finish-args:
   - --device=all
   - --share=ipc
   - --share=network
-  - --socket=fallback-x11
-  - --socket=wayland
+  - --socket=x11
   - --socket=pulseaudio
   - --filesystem=host
 command: scummvm_wrapper
