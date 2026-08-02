@@ -22,6 +22,7 @@ finish-args:
   - --filesystem=xdg-download
   - --filesystem=host
   - --env=WINEPREFIX=/var/data/wine
+  - --env=FONTCONFIG_FILE=/etc/fonts/fonts.conf
 
 modules:
   - name: box64
@@ -38,6 +39,17 @@ modules:
           - sed -i 's|DESTINATION /etc|DESTINATION etc|g' CMakeLists.txt
           - sed -i 's|/usr/lib/box64-x86_64-linux-gnu|lib/box64-x86_64-linux-gnu|g' CMakeLists.txt
 
+  # Wine 11.0, built from the Kron4ek/Wine-Builds scripts with one patch applied:
+  # cmd's WCMD_wait_for_input() waits on the console input handle before issuing
+  # any read, which deadlocks on a Wine unix console because the input object
+  # cannot become signaled until conhost's tty reader thread is started -- and
+  # that thread is only started by a read or peek ioctl.  Without the patch
+  # `wine cmd /c pause` hangs forever, which is what the eXo SystemShock
+  # launcher (SSP.exe -> cmd /s/c SSP.bat -> pause) trips over.
+  #
+  # Not macOS- or ARM-specific; it reproduces on plain x86_64 Linux too, and
+  # WCMD_wait_for_input() is unchanged in upstream master.  Drop this custom
+  # build and return to Kron4ek's release once the fix lands upstream.
   - name: wine-amd64-wow64
     buildsystem: simple
     build-commands:
@@ -45,15 +57,15 @@ modules:
       - cp -r * /app/wine/
     sources:
       - type: archive
-        url: https://github.com/Kron4ek/Wine-Builds/releases/download/11.10/wine-11.10-amd64-wow64.tar.xz
-        sha256: 14792da5d655657f81c5a2968d43ed137adcf4a14c5db036d048f54cf4c632f9
+        url: https://github.com/jonesaaronj/exo_flatpaks/releases/download/source_bundles/wine-11.0-amd64-wow64.tar.xz
+        sha256: 4810b2b0f53d36441004c9cfa77b262ce3dc5359c0f519d0cda72570babfc27e
 
   # Wine looks in $WINEDATADIR ( = /app/wine/share/wine ) for mono/gecko before
   # prompting the user to download them. Extracted tarballs are used as a
   # "shared install": nothing is copied into the wineprefix, so first run is
   # instant and one copy serves every prefix. Versions must match what this
-  # Wine build expects (see dlls/appwiz.cpl/addons.c for wine-11.10:
-  # mono 11.1.0, gecko 2.47.4).
+  # Wine build expects (see dlls/appwiz.cpl/addons.c for wine-11.0:
+  # mono 10.4.1, gecko 2.47.4).
   - name: wine-mono
     buildsystem: simple
     build-commands:
@@ -61,9 +73,9 @@ modules:
       - cp -a wine-mono-* /app/wine/share/wine/mono/
     sources:
       - type: archive
-        url: https://dl.winehq.org/wine/wine-mono/11.1.0/wine-mono-11.1.0-x86.tar.xz
+        url: https://dl.winehq.org/wine/wine-mono/10.4.1/wine-mono-10.4.1-x86.tar.xz
         strip-components: 0
-        sha256: 01a7cdc0184c5b22fdf6e7417d50648467b566a107cd51df9c4f3a4acd960c9c
+        sha256: a16606ef0724202e6a6848ece6e0cbba64d11e2f11aefe744af1d93c6d9f99bb
 
   - name: wine-gecko
     buildsystem: simple

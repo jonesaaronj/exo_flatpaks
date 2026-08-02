@@ -401,10 +401,9 @@ modules:
       - --disable-static
       - --disable-doc
     sources:
-      - type: git
-        url: https://dev.gnupg.org/source/libgcrypt.git
-        tag: libgcrypt-1.10.3
-        commit: aa1610866f8e42bdc272584f0a717f32ee050a22
+      - type: archive
+        url: https://www.gnupg.org/ftp/gcrypt/libgcrypt/libgcrypt-1.10.3.tar.bz2
+        sha256: 8b0870897ac5ac67ded568dcfadf45969cfa8a6beb0fd60af2a9eadc2a3272aa
         # disabled for libgcrypt-1.11 because of build fail
         #x-checker-data:
         #  type: anitya

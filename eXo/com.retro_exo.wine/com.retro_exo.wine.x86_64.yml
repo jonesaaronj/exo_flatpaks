@@ -25,6 +25,7 @@ finish-args:
   - --env=WINEPREFIX=/var/data/wine
   - --env=GST_PLUGIN_SYSTEM_PATH=/app/lib/gstreamer-1.0:/app/lib32/gstreamer-1.0:/usr/lib/extensions/gstreamer-1.0:/usr/lib/x86_64-linux-gnu/codecs-extra/lib/gstreamer-1.0:/usr/lib/i386-linux-gnu/codecs-extra/lib/gstreamer-1.0:/usr/lib/x86_64-linux-gnu/gstreamer-1.0:/usr/lib/i386-linux-gnu/gstreamer-1.0
   - --env=WINEDLLOVERRIDES="winemenubuilder.exe=d;winealsa.drv=d"
+  - --env=FONTCONFIG_FILE=/etc/fonts/fonts.conf
 command: wine-wrapper
 appstream-compose: false
 
@@ -316,6 +317,26 @@ modules:
           url-template: https://dl.winehq.org/wine/source/$major.$minor/wine-$version.tar.xz
           is-main-source: true
 
+      # cmd's WCMD_wait_for_input() waits on the console input handle before it
+      # has issued any read, which deadlocks on a Wine unix console: the input
+      # object cannot become signaled until conhost's tty reader thread is
+      # running, and that thread is only started by a read or peek ioctl.  So
+      # `wine cmd /c pause` hangs forever in a terminal, which is what the eXo
+      # SystemShock launcher (SSP.exe -> cmd /s/c SSP.bat -> pause) trips over.
+      # `dir /p` hangs the same way once the listing is long enough to page.
+      #
+      # This entry sits inside the &wine-sources anchor deliberately, so the
+      # wine-32bit module below picks it up through *wine-sources as well --
+      # both builds must be patched.
+      #
+      # Reported upstream; WCMD_wait_for_input() is unchanged between wine-11.0
+      # and master.  If the x-checker-data above ever bumps this to a Wine that
+      # carries the fix, the patch will stop applying and the build will fail
+      # loudly rather than silently shipping an unpatched cmd -- which is the
+      # intended behaviour.  Remove this entry at that point.
+      - type: patch
+        path: 0001-cmd-Prime-console-input-before-waiting-in-WCMD_wait_for_input.patch
+
   # 32-bit compatibility build
 
   - name: wine-32bit
@@ -351,7 +372,7 @@ modules:
       - type: archive
         url: https://github.com/Winetricks/winetricks/archive/refs/tags/20260125.tar.gz
         sha256: 2890bd9fbbade4638e58b4999a237273192df03b58516ae7b8771e09c22d2f56
-        
+
     modules:
       - name: 7zip
         buildsystem: simple
@@ -369,7 +390,7 @@ modules:
       - name: cabextract
         sources:
           - type: archive
-            url: https://www.cabextract.org.uk/cabextract-1.11.tar.gz
+            url: https://mirrors.mit.edu/macports/distfiles/cabextract/cabextract-1.11.tar.gz
             sha256: b5546db1155e4c718ff3d4b278573604f30dd64c3c5bfd4657cd089b823a3ac6
             x-checker-data:
               type: anitya
