@@ -4,16 +4,18 @@ runtime-version: '25.08'
 sdk: org.freedesktop.Sdk
 sdk-extensions:
   - org.freedesktop.Sdk.Extension.rust-nightly
+  - org.freedesktop.Sdk.Extension.llvm21
 command: martypc
 
 finish-args:
   # Graphics Acceleration (Required for wgpu/OpenGL)
-  - --device=dri
+  - --device=all
   - --socket=x11
   # Audio (ALSA via PulseAudio/PipeWire)
   - --socket=pulseaudio
   # File access to load external Floppy/HDD images
   - --filesystem=host
+  - --env=WINIT_UNIX_BACKEND=x11
 
 modules:
   - name: martypc
@@ -23,6 +25,7 @@ modules:
       append-path: /usr/lib/sdk/rust-nightly/bin
       env:
         RUSTFLAGS: "-C linker=cc"
+        LIBCLANG_PATH: /usr/lib/sdk/llvm21/lib
 
     buildsystem: simple
     build-commands:
@@ -43,8 +46,8 @@ modules:
       - |
         cat << 'EOF' > /app/bin/martypc
         #!/bin/sh
-        cd /app/libexec/martypc
-        exec ./martypc "$@"
+        unset WAYLAND_DISPLAY
+        exec /app/libexec/martypc/martypc "$@"
         EOF
       - chmod +x /app/bin/martypc
 
