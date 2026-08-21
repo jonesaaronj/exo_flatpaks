@@ -2,8 +2,6 @@ app-id: com.retro_exo.mcomix
 runtime: org.freedesktop.Platform
 runtime-version: '25.08'
 sdk: org.freedesktop.Sdk
-sdk-extensions:
-  - org.freedesktop.Sdk.Extension.llvm21
 command: mcomix
 cleanup:
   - /share/applications
@@ -31,17 +29,14 @@ modules:
     build-commands:
       - |
         for bundle in Alone2 SFXCon; do
-          pushd CPP/7zip/Bundles/${bundle}
-          make -j ${FLATPAK_BUILDER_N_JOBS} -f ../../cmpl_gcc.mak
-          popd
+          (cd CPP/7zip/Bundles/${bundle} && make -j ${FLATPAK_BUILDER_N_JOBS} -f ../../cmpl_gcc.mak)
         done
-      - install -Dm755 CPP/7zip/Bundles/Alone2/b/g/7zz   $FLATPAK_DEST/bin/7z
+      - install -Dm755 CPP/7zip/Bundles/Alone2/b/g/7zz $FLATPAK_DEST/bin/7z
       - install -Dm755 CPP/7zip/Bundles/SFXCon/b/g/7zCon $FLATPAK_DEST/bin/7zCon.sfx
     sources:
       - type: archive
-        url: https://github.com/ip7z/7zip/archive/refs/tags/26.00.tar.gz
-        tag: '26.00'
-        sha256: 07eafed75d661282d402dc2a3edf17e1dbb36fb813f4fbf5a2bad4f6b722aed5
+        url: https://github.com/ip7z/7zip/archive/refs/tags/26.03.tar.gz
+        sha256: 74b11efd8559f9b3dc652e89dc8ebdf4acb66e514a745e44cf75582cdf4512fd
 
   - name: unrar
     no-autogen: true

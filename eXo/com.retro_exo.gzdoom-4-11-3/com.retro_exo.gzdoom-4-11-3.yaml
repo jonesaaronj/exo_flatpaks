@@ -1,7 +1,7 @@
 app-id: com.retro_exo.gzdoom-4-11-3
 runtime: org.freedesktop.Platform
 sdk: org.freedesktop.Sdk
-runtime-version: "25.08"
+runtime-version: '26.08'
 command: gzdoom.sh
 
 finish-args:

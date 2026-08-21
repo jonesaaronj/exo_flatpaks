@@ -25,7 +25,7 @@ modules:
       append-path: /usr/lib/sdk/rust-nightly/bin
       env:
         RUSTFLAGS: "-C linker=cc"
-        LIBCLANG_PATH: /usr/lib/sdk/llvm21/lib
+        LIBCLANG_PATH: /usr/lib/sdk/llvm22/lib
 
     buildsystem: simple
     build-commands:
