@@ -105,6 +105,19 @@ modules:
           project-id: 115592
           url-template: https://github.com/zlib-ng/zlib-ng/archive/refs/tags/$version.tar.gz
 
+  - name: SDL2_net
+    config-opts:
+      - "--disable-static"
+    rm-configure: true
+    sources:
+      - type: archive
+        url: https://github.com/libsdl-org/SDL_net/releases/download/release-2.4.0/SDL2_net-2.4.0.tar.gz
+        sha256: 9cbca2527feb3f1a622d48ba65cc7dee9b1e3f2c55ceafb7d7720bb058aafb30
+      - type: script
+        dest-filename: autogen.sh
+        commands:
+          - AUTOMAKE="automake --foreign" autoreconf -vfi
+
   # Build DOSBox-Staging
   - name: dosbox-staging
     buildsystem: meson

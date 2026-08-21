@@ -1,0 +1,262 @@
+app-id: com.retro_exo.abiword
+runtime: org.gnome.Platform
+runtime-version: '50'
+sdk: org.gnome.Sdk
+command: abiword
+appstream-compose: false
+finish-args:
+  - --share=ipc
+  - --socket=x11
+  - --filesystem=host
+  - --share=network
+  - --talk-name=org.gtk.vfs.*
+  - --filesystem=xdg-run/gvfs
+  - --filesystem=xdg-run/gvfsd
+build-options:
+  env:
+    V: "0"
+cleanup:
+  - /lib/pkgconfig
+  - /share/man
+  - "*.la"
+  - "*.a"
+  - /share/applications
+  - /share/icons
+  - /share/metainfo
+  - /share/appdata
+modules:
+  - ../../shared-modules/intltool/intltool-0.51.json
+  - name: boost
+    buildsystem: simple
+    cleanup:
+      - /include
+      - /lib/libboost_*.so*
+      - /lib/libboost_*.a
+    build-commands:
+      - ./bootstrap.sh --with-libraries=atomic
+      - ./b2 install variant=release link=shared runtime-link=shared
+        --prefix=/app --without-math --without-thread --without-container
+        --without-log --without-system --without-filesystem --without-chrono
+        --without-random --without-python -j $FLATPAK_BUILDER_N_JOBS
+    sources:
+      - type: archive
+        url: https://downloads.sourceforge.net/project/boost/boost/1.90.0/boost_1_90_0.tar.bz2
+        sha256: 49551aff3b22cbc5c5a9ed3dbc92f0e23ea50a0f7325b0d198b705e8ee3fc305
+  - name: gsf
+    cleanup:
+      - /include
+      - /lib/pkgconfig
+      - /share/man
+      - /share/gtk-doc/html/gsf
+      - /share/thumbnailers
+      - /bin/gsf*
+    sources:
+      - type: archive
+        url: https://download.gnome.org/sources/libgsf/1.14/libgsf-1.14.55.tar.xz
+        sha256: 74d60abba15bd3ea5ad17da5b924d8e36f649a25c3dc77adbabd2a3628a02131
+        x-checker-data:
+          type: gnome
+          name: libgsf
+          versions:
+            <: "1.15"
+          stable-only: true
+  - name: libwmf
+    cleanup:
+      - /include
+      - /lib/gtk-2.0
+      - /share/doc/libwmf
+      - /bin/libwmf*
+      - /bin/wmf*
+    config-opts:
+      - --with-freetype=/usr
+    sources:
+      - type: archive
+        url: https://github.com/caolanm/libwmf/archive/refs/tags/v0.2.14.tar.gz
+        sha256: dea2a07ed27fc041a9b2901dc9d12f0d68b76cee6578df955a559b340c32a86c
+      - type: shell
+        commands:
+          - autoreconf -vfi
+  - name: wv
+    cleanup:
+      - /include
+      - /share/man
+      - /share/wv
+      - /lib/pkgconfig
+      - /bin/wv*
+    sources:
+      - type: archive
+        url: https://github.com/AbiWord/wv/archive/refs/tags/wv-1-2-9.tar.gz
+        sha256: effe7a2b5b81a3707c60894e7799f7c086fdec76549eb80c1e8fb835b873d2c9
+      - type: shell
+        commands:
+          - touch AUTHORS ChangeLog
+      - type: shell
+        commands:
+          - autoreconf -vfi
+  - name: link-grammar
+    cleanup:
+      - /include
+      - /lib/pkgconfig
+      - /bin/link-parser
+    sources:
+      - type: archive
+        url: https://github.com/AbiWord/link-grammar/archive/refs/tags/link-grammar-5.3.11.tar.gz
+        sha256: 3c9634289b6e74b59336b97265169b850efa2575174b338bbfbe1354b5606d06
+  - name: lasem
+    cleanup:
+      - /include
+      - /lib/pkgconfig
+      - /doc
+      - /share/gir-1.0
+      - /share/gtk-doc
+      - /share/man
+      - /bin/lasem*
+    sources:
+      - type: archive
+        url: https://download.gnome.org/sources/lasem/0.5/lasem-0.5.1.tar.xz
+        sha256: 51f019984bc94b8a0dec70bb7af2950345759304584a5cc3d990d9ff2c66b443
+        x-checker-data:
+          type: gnome
+          name: lasem
+          versions:
+            <: "0.6"
+          stable-only: false
+  - name: goffice
+    cleanup:
+      - /include
+      - /share/gtk-doc
+      - /lib/pkgconfig
+    sources:
+      - type: archive
+        url: https://download.gnome.org/sources/goffice/0.10/goffice-0.10.60.tar.xz
+        sha256: 01154338cbffac172fc53338ebb9d527c821ffc21985a2ccfa84923ee6b761c5
+        x-checker-data:
+          type: gnome
+          name: goffice
+          versions:
+            <: "0.11"
+          stable-only: true
+  - name: librevenge
+    cleanup:
+      - /include
+      - /lib/pkgconfig
+    config-opts:
+      - --disable-tests
+      - --disable-werror
+      - --without-docs
+    sources:
+      - type: archive
+        url: https://downloads.sourceforge.net/project/libwpd/librevenge/librevenge-0.0.5/librevenge-0.0.5.tar.xz
+        sha256: 106d0c44bb6408b1348b9e0465666fa83b816177665a22cd017e886c1aaeeb34
+  - name: libwpd
+    build-options:
+      cxxflags: -Wno-error=restrict
+    config-opts:
+      - --without-docs
+    cleanup:
+      - /include
+      - /share/doc
+      - /lib/pkgconfig
+      - /bin/wpd*
+    sources:
+      - type: archive
+        url: https://downloads.sourceforge.net/project/libwpd/libwpd/libwpd-0.9.9/libwpd-0.9.9.tar.xz
+        sha256: b91df4ca0ef0f456be9531c9ee07cf6a5e50a16b52002abb99e8ebef13fac2b2
+  - name: libwpg
+    cleanup:
+      - /include
+      - /share/doc
+      - /lib/pkgconfig
+      - /bin/wpg*
+    config-opts:
+      - --without-docs
+    sources:
+      - type: archive
+        url: https://downloads.sourceforge.net/project/libwpg/libwpg/libwpg-0.2.2/libwpg-0.2.2.tar.xz
+        sha256: b49bfd77b9447534dee0d43bbdc48b4dcb09339605be21c01726243d5069a6cd
+  - name: ed
+    cleanup:
+      - "*"
+    sources:
+      - type: archive
+        url: https://mirrors.ibiblio.org/gnu/ed/ed-1.22.5.tar.lz
+        sha256: 56e107ddc2f29dad6690376c15bf9751509e1ee3b8241710e44edbe5c3a158cc
+  - name: bc
+    cleanup:
+      - "*"
+    sources:
+      - type: archive
+        url: https://ftp.gnu.org/gnu/bc/bc-1.08.2.tar.gz
+        sha256: ae470fec429775653e042015edc928d07c8c3b2fc59765172a330d3d87785f86
+  - name: psiconv
+    cleanup:
+      - /include
+      - /share/man
+      - /share/psiconv
+      - /bin/psiconv*
+    sources:
+      - type: archive
+        url: http://www.frodo.looijaard.name/system/files/software/psiconv/psiconv-0.9.9.tar.gz
+        mirror-urls:
+          - https://github.com/jonesaaronj/exo_flatpaks/releases/download/source_bundles/psiconv-0.9.9.tar.gz
+        sha256: 6d51fe79b502a1e277bea275a574ae2db5b1b9d7daef703a8fa3635ae02a8bb0
+      - type: patch
+        path: patches/psiconv-fixes.patch
+      - type: shell
+        commands:
+          - autoreconf -vfi
+  - name: gtkmathview
+    cleanup:
+      - /include
+      - /lib/pkgconfig
+      - /share/man
+      - /bin/mathml*
+    sources:
+      - type: archive
+        url: https://github.com/AbiWord/gtkmathview/releases/download/0.8.1/gtkmathview-0.8.1.tar.xz
+        sha256: 2ab60a33ef1cd76591e70770799e6bc0b2600c5366933a7c1978a33a54faae44
+  - name: libwps
+    cleanup:
+      - /include
+      - /share/doc
+      - /lib/pkgconfig
+      - /bin/wks*
+      - /bin/wps*
+    config-opts:
+      - --disable-werror
+      - --without-docs
+    sources:
+      - type: archive
+        url: https://downloads.sourceforge.net/project/libwps/libwps/libwps-0.2.10/libwps-0.2.10.tar.xz
+        sha256: 2d9771489d2474d483089174e50f57f35785d0a444d390b0dfc7eae1b42b4b12
+  - name: enchant
+    config-opts:
+      - --with-hunspell
+      - --with-myspell-dir=/usr/share/hunspell
+    build-options:
+      cflags: -fpermissive
+    cleanup:
+      - /include
+      - /lib/pkgconfig
+      - /bin/enchant
+    post-install:
+      - install -p -D -m 0644 COPYING.LIB -t
+        ${FLATPAK_DEST}/share/licenses/enchant/
+    sources:
+      - type: archive
+        url: https://github.com/rrthomas/enchant/archive/refs/tags/enchant-1-6-1.tar.gz
+        sha256: ed2b11211a571ab5f963debf4c3bf3fc46541bb9cbb441b2997bd871ba8618d4
+      - type: shell
+        commands:
+          - autoreconf -vfi
+  - name: abiword
+    config-opts:
+      - --enable-plugins=auto
+    build-options:
+      cppflags: -DFLATPAK_BUILD
+    cleanup:
+      - /include
+    sources:
+      - type: archive
+        url: https://gitlab.gnome.org/World/AbiWord/-/archive/release-3.0.8/AbiWord-release-3.0.8.tar.gz?ref_type=tags
+        sha256: 7c490e46f0a6143f84d5c7e3fed246f34486ad70cd55f162c792827607cd7e9a

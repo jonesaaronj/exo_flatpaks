@@ -1,0 +1,139 @@
+id: com.retro_exo.gnumeric
+runtime: org.gnome.Platform
+runtime-version: '50'
+sdk: org.gnome.Sdk
+command: gnumeric
+appstream-compose: false
+finish-args:
+  - --share=ipc
+  - --socket=x11
+  - --filesystem=host
+  - --share=network
+  - --talk-name=org.gtk.vfs.*
+  - --filesystem=xdg-run/gvfs
+  - --filesystem=xdg-run/gvfsd
+cleanup:
+  - /lib/pkgconfig
+  - /share/man
+  - "*.la"
+  - "*.a"
+  - /share/applications
+  - /share/icons
+  - /share/metainfo
+  - /share/appdata
+modules:
+  - ../../shared-modules/intltool/intltool-0.51.json
+  - name: gsf
+    config-opts:
+      - --disable-static
+    cleanup:
+      - /include
+      - /lib/pkgconfig
+      - /share/man
+      - /share/gtk-doc/html/gsf
+      - /share/thumbnailers
+      - /bin/gsf*
+      - "*.la"
+    sources:
+      - type: archive
+        url: https://download.gnome.org/sources/libgsf/1.14/libgsf-1.14.55.tar.xz
+        sha256: 74d60abba15bd3ea5ad17da5b924d8e36f649a25c3dc77adbabd2a3628a02131
+        x-checker-data:
+          type: gnome
+          name: libgsf
+          versions:
+            <: "1.15"
+          stable-only: true
+  - name: goffice
+    config-opts:
+      - --disable-static
+    cleanup:
+      - /include
+      - /share/gtk-doc
+      - /lib/pkgconfig
+      - "*.la"
+    sources:
+      - type: archive
+        url: https://download.gnome.org/sources/goffice/0.10/goffice-0.10.61.tar.xz
+        sha256: 558597fd9ca59b93ff562750218d1e7ea8ec3c8d0ed6a5cc096aa715ef909a15
+        x-checker-data:
+          type: gnome
+          name: goffice
+          versions:
+            <: "0.11"
+          stable-only: true
+      - type: file
+        path: patches/goffice-image-sniff.py
+      - type: file
+        path: patches/goffice-pixbuf-close.py
+      - type: shell
+        commands:
+          - python3 goffice-image-sniff.py goffice/utils/go-image.c
+          - python3 goffice-pixbuf-close.py goffice/utils/go-pixbuf.c
+  - name: ed
+    cleanup:
+      - "*"
+    sources:
+      - type: archive
+        url: https://mirrors.ibiblio.org/gnu/ed/ed-1.22.5.tar.lz
+        sha256: 56e107ddc2f29dad6690376c15bf9751509e1ee3b8241710e44edbe5c3a158cc
+  - name: bc
+    cleanup:
+      - "*"
+    sources:
+      - type: archive
+        url: https://ftp.gnu.org/gnu/bc/bc-1.08.2.tar.gz
+        sha256: ae470fec429775653e042015edc928d07c8c3b2fc59765172a330d3d87785f86
+  - name: psiconv
+    config-opts:
+      - --disable-static
+    cleanup:
+      - /include
+      - /share/man
+      - /share/psiconv
+      - /bin/psiconv*
+      - "*.la"
+    build-options:
+      cflags: -fcommon
+    sources:
+      - type: archive
+        url: http://www.frodo.looijaard.name/system/files/software/psiconv/psiconv-0.9.9.tar.gz
+        mirror-urls:
+          - https://github.com/jonesaaronj/exo_flatpaks/releases/download/source_bundles/psiconv-0.9.9.tar.gz
+        sha256: 6d51fe79b502a1e277bea275a574ae2db5b1b9d7daef703a8fa3635ae02a8bb0
+      - type: patch
+        path: patches/psiconv-fixes.patch
+      - type: shell
+        commands:
+          - autoreconf -vfi
+  - name: pxlib
+    build-options:
+      cflags: -fpermissive
+    config-opts:
+      - --disable-static
+    cleanup:
+      - /include
+      - "*.la"
+    sources:
+      - type: archive
+        url: https://download.sourceforge.net/project/pxlib/pxlib/0.6.8/pxlib-0.6.8.tar.gz
+        sha256: 5f9b58a5c3d9e5e60faad16dfbc5172ee14ae57a978732378660c0f2c9e74ef9
+  - name: gnumeric
+    buildsystem: autotools
+    cleanup:
+      - /include
+    sources:
+      - type: archive
+        url: https://download.gnome.org/sources/gnumeric/1.12/gnumeric-1.12.61.tar.xz
+        sha256: 2ac135d856572713c1a408b76b50a59f2a9769ed21f1213446b5af255df20a12
+        x-checker-data:
+          type: gnome
+          name: gnumeric
+          stable-only: true
+      - type: patch
+        path: patches/gnumerica-appstream.patch
+      - type: file
+        path: patches/gnumeric-psiconv-fix.py
+      - type: shell
+        commands:
+          - python3 gnumeric-psiconv-fix.py plugins/psiconv/psiconv-read.c
