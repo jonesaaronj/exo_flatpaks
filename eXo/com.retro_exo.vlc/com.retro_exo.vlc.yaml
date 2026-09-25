@@ -51,7 +51,7 @@ build-options:
     V: '1'
 modules:
   - ../../shared-modules/intltool/intltool-0.51.json
-  - ../../shared-modules/SDL/SDL-1.2.15.json
+  - ../../shared-modules/SDL/sdl12-compat.json
   - ../../shared-modules/SDL/SDL_image-1.2.12.json
   - ../../shared-modules/lua5.3/lua-5.3.5.json
   - ../../shared-modules/glu/glu-9.json

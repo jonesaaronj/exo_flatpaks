@@ -1,4 +1,4 @@
-app-id: com.retro_exo.dosbox-ece-r4482
+app-id: com.retro_exo.dosbox-ece-r4301
 runtime: org.freedesktop.Platform
 runtime-version: '25.08'
 sdk: org.freedesktop.Sdk
@@ -28,7 +28,7 @@ cleanup:
 modules:
   - "../../shared-modules/glu/glu-9.json"
   - "../../shared-modules/glew/glew.json"  
-  - "../../shared-modules/SDL/SDL-1.2.15.json"
+  - "../../shared-modules/SDL/sdl12-compat.json"
   - "../../shared-modules/SDL/SDL_net-1.2.8.json"
   - "../../shared-modules/linux-audio/fluidsynth2.json"
   - name: open-glide
@@ -52,7 +52,7 @@ modules:
           type: anitya
           project-id: 220368
           url-template: https://github.com/munt/munt/archive/libmt32emu_$version.tar.gz
-  - name: dosbox-ece-r4482
+  - name: dosbox-ece-r4301
     buildsystem: simple
     build-commands:
       - ./autogen.sh
@@ -64,5 +64,5 @@ modules:
         - --share=network
     sources:
       - type: archive
-        url: https://github.com/jonesaaronj/exo_flatpaks/releases/download/source_bundles/ece-r4482-source.tar.gz
-        sha256: 2f7456ac4ec314766a813c86a48977e2fb82dfeae9ca9bf1a08cff70fb638b8c
+        url: https://github.com/jonesaaronj/exo_flatpaks/releases/download/source_bundles/ece-r4301-source.tar.gz
+        sha256: 234e1dabe4be23a38af2f7909d57ad48072005992779559f5638fad9e4cc5787
