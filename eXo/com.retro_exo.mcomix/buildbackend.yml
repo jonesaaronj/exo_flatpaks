@@ -1,38 +1,44 @@
 name: python3-buildbackend
-cleanup:
-  - '*'
 modules:
   - name: python3-flit-core
     buildsystem: simple
+    cleanup:
+      - '*'
     build-commands:
       - pip3 install --verbose --exists-action=i --no-index --find-links="file://${PWD}"
         --prefix=${FLATPAK_DEST} "flit-core" --no-build-isolation
     sources:
       - type: file
-        url: https://files.pythonhosted.org/packages/69/59/b6fc2188dfc7ea4f936cd12b49d707f66a1cb7a1d2c16172963534db741b/flit_core-3.12.0.tar.gz
-        sha256: 18f63100d6f94385c6ed57a72073443e1a71a4acb4339491615d0f16d6ff01b2
+        url: https://files.pythonhosted.org/packages/46/ef/34533186e76c526d9ec17a1ad9a10c7354cbfb20f51583cc36dfe4bdccd0/flit_core-4.0.2.tar.gz
+        sha256: b6929defd93884b584d7c87829e0e7b5c26ed6be17b0b873979019314aa841c8
         x-checker-data:
           name: flit-core
           type: pypi
 
   - name: python3-meson-python
     buildsystem: simple
+    cleanup:
+      - '*'
     build-commands:
       - pip3 install --verbose --exists-action=i --no-index --find-links="file://${PWD}"
         --prefix=${FLATPAK_DEST} "meson-python" --no-build-isolation
     sources:
       - type: file
-        url: https://files.pythonhosted.org/packages/83/fa/8bf4fa41adfebd95dce360afe3f5fca243a17932089d3d5486e95ca44c57/pyproject_metadata-0.11.0.tar.gz
-        sha256: c72fa49418bb7c5a10f25e050c418009898d1c051721d19f98a6fb6da59a66cf
+        url: https://files.pythonhosted.org/packages/88/ef/eb23f262cca3c0c4eb7ab1933c3b1f03d021f2c48f54763065b6f0e321be/packaging-24.2-py3-none-any.whl
+        sha256: 09abb1bccd265c01f4a3aa3f7a7db064b36514d2cba19a2f694fe6150451a759
+        x-checker-data:
+          type: pypi
+          name: packaging
+      - type: file
+        url: https://files.pythonhosted.org/packages/4f/76/1cae539918a7b1746d624c2f01560b793c22cd8c081157505bb9bbf0e34d/pyproject_metadata-0.12.1.tar.gz
+        sha256: 8809a4df6fe08279b39a8890669506ed3158e0617855ac9aff098fcbe772ae4c
         x-checker-data:
           name: pyproject-metadata
           type: pypi
       - type: file
-        url: https://files.pythonhosted.org/packages/16/7f/d1b0c65b267a1463d752b324f11d3470e30889daefc4b9ec83029bfa30b5/meson_python-0.19.0-py3-none-any.whl
-        sha256: 67b5906c37404396d23c195e12c8825506074460d4a2e7083266b845d14f0298
+        url: https://files.pythonhosted.org/packages/9e/4f/03aeed5a32e7e8158d8c617fe65b622410db974fe02e3bd78da9689a44fd/meson_python-0.21.1-py3-none-any.whl
+        sha256: 270bc9b78957c47e0aa1758ad616dba3f943d8f9cbdb944d318c3c1c7a49e4bd
         x-checker-data:
           name: meson-python
           type: pypi
           packagetype: bdist_wheel
-
-

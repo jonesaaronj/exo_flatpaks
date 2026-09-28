@@ -1,6 +1,6 @@
 app-id: com.retro_exo.vlc
 runtime: org.kde.Platform
-runtime-version: 5.15-25.08
+runtime-version: "6.11"
 sdk: org.kde.Sdk
 command: vlc
 appstream-compose: false
@@ -23,7 +23,7 @@ finish-args:
   - --filesystem=xdg-run/gvfs
 add-extensions:
   org.videolan.VLC.Plugin:
-    versions: 3-5.15-25.08;3-25.08
+    versions: 3-26.08
     directory: share/vlc/extra
     subdirectories: true
     merge-dirs: plugins

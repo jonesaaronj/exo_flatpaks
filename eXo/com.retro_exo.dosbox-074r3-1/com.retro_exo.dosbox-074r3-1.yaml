@@ -1,6 +1,6 @@
 app-id: com.retro_exo.dosbox-074r3-1
 runtime: org.freedesktop.Platform
-runtime-version: "25.08"
+runtime-version: "26.08"
 sdk: org.freedesktop.Sdk
 build-options:
   cflags: -O2 -U_FORTIFY_SOURCE -D_FORTIFY_SOURCE=2

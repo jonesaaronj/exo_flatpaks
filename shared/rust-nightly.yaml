@@ -1,0 +1,101 @@
+name: rust
+buildsystem: simple
+build-options:
+  strip: false
+  no-debuginfo: true
+  env:
+    SDK_PREFIX: /app/rust-nightly
+
+build-commands:
+  - |
+    cd rust
+    ./install.sh --prefix=${SDK_PREFIX} \
+      --without=rust-docs,rust-docs-json-preview \
+      --disable-ldconfig --verbose
+
+  - |
+    cd rust-src
+    ./install.sh --prefix=${SDK_PREFIX} --disable-ldconfig \
+      --verbose
+
+  - install -Dm0755 mold/bin/mold ${SDK_PREFIX}/bin/mold
+  - install -Dm0755 mold/bin/ld.mold ${SDK_PREFIX}/bin/ld.mold
+
+  - |
+    gunzip rust-analyzer.gz
+    install -Dm0755 rust-analyzer ${SDK_PREFIX}/bin/rust-analyzer
+
+  - install -Dm0755 enable.sh ${SDK_PREFIX}/enable.sh
+
+sources:
+  - type: archive
+    only-arches:
+      - aarch64
+    url: https://static.rust-lang.org/dist/2026-09-13/rust-nightly-aarch64-unknown-linux-gnu.tar.gz
+    sha256: 6cbbf55ab8840d7b5caa47c4f587e0695d0f908d9fcdc68887fbc4f88583d8ef
+    dest: rust
+
+  - type: archive
+    only-arches:
+      - x86_64
+    url: https://static.rust-lang.org/dist/2026-09-13/rust-nightly-x86_64-unknown-linux-gnu.tar.gz
+    sha256: b22e0120c8b337a13ddf84c62d7dbe21314cf998e4e281cd1af28c2c59cd7ca0
+    dest: rust
+
+  - type: archive
+    url: https://static.rust-lang.org/dist/2026-09-13/rust-src-nightly.tar.gz
+    sha256: ea1ab8a8428c0cfa2916e2d574e60aca6ee8f1bd4464b3d190ff94edcd27a128
+    dest: rust-src
+
+  - type: archive
+    only-arches:
+      - x86_64
+    url: https://github.com/rui314/mold/releases/download/v2.42.1/mold-2.42.1-x86_64-linux.tar.gz
+    sha256: 6ff270c9bf07d2bec5c98aa324eb7c4daf6a1a4d815c05ff1708049616047855
+    dest: mold
+    x-checker-data:
+      type: anitya
+      project-id: 241732
+      stable-only: true
+      url-template: https://github.com/rui314/mold/releases/download/v$version/mold-$version-x86_64-linux.tar.gz
+
+  - type: archive
+    only-arches:
+      - aarch64
+    url: https://github.com/rui314/mold/releases/download/v2.42.1/mold-2.42.1-aarch64-linux.tar.gz
+    sha256: 16b025652d3d7456689e6025a77e1903bb2a15e7630877c26cc133f5df95b9c6
+    dest: mold
+    x-checker-data:
+      type: anitya
+      project-id: 241732
+      stable-only: true
+      url-template: https://github.com/rui314/mold/releases/download/v$version/mold-$version-aarch64-linux.tar.gz
+
+  - type: file
+    only-arches:
+      - x86_64
+    url: https://github.com/rust-lang/rust-analyzer/releases/download/2026-09-07/rust-analyzer-x86_64-unknown-linux-gnu.gz
+    sha256: a3500183aa08bf740c0da6e030ad262d4cfa1c19e7ce195ab5f772bdf9ddfb12
+    dest-filename: rust-analyzer.gz
+    x-checker-data:
+      type: json
+      url: https://api.github.com/repos/rust-analyzer/rust-analyzer/releases/latest
+      version-query: .tag_name
+      url-query: .assets[] | select(.name=="rust-analyzer-x86_64-unknown-linux-gnu.gz") | .browser_download_url
+
+  - type: file
+    only-arches:
+      - aarch64
+    url: https://github.com/rust-lang/rust-analyzer/releases/download/2026-09-07/rust-analyzer-aarch64-unknown-linux-gnu.gz
+    sha256: 484de96ea9e5daf9e6361b6fa91be9521a7e6c652111af54a7ead80f900b1e55
+    dest-filename: rust-analyzer.gz
+    x-checker-data:
+      type: json
+      url: https://api.github.com/repos/rust-analyzer/rust-analyzer/releases/latest
+      version-query: .tag_name
+      url-query: .assets[] | select(.name=="rust-analyzer-aarch64-unknown-linux-gnu.gz") | .browser_download_url
+
+  - type: script
+    commands:
+      - export PATH=$PATH:/app/rust-nightly/bin
+    dest-filename: enable.sh
