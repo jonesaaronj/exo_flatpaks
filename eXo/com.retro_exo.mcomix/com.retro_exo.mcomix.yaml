@@ -1,15 +1,11 @@
 app-id: com.retro_exo.mcomix
 runtime: org.freedesktop.Platform
-runtime-version: '25.08'
+runtime-version: '26.08'
 sdk: org.freedesktop.Sdk
 sdk-extensions:
-  - org.freedesktop.Sdk.Extension.llvm21
+  - org.freedesktop.Sdk.Extension.llvm22
 command: mcomix
-cleanup:
-  - /share/applications
-  - /share/icons
-  - /share/metainfo
-  - /share/appdata
+
 finish-args:
   - --share=ipc
   - --socket=x11
@@ -25,6 +21,12 @@ finish-args:
   - --filesystem=/run/media
   - --filesystem=host
 
+cleanup:
+  - /share/applications
+  - /share/icons
+  - /share/metainfo
+  - /share/appdata
+
 modules:
   - name: 7-zip
     buildsystem: simple
@@ -32,16 +34,18 @@ modules:
       - |
         for bundle in Alone2 SFXCon; do
           pushd CPP/7zip/Bundles/${bundle}
-          make -j ${FLATPAK_BUILDER_N_JOBS} -f ../../cmpl_gcc.mak
+          make -j ${FLATPAK_BUILDER_N_JOBS} -f ../../cmpl_gcc.mak O=b/g CXX="g++ -Wno-error" CC="gcc -Wno-error"
           popd
         done
       - install -Dm755 CPP/7zip/Bundles/Alone2/b/g/7zz   $FLATPAK_DEST/bin/7z
       - install -Dm755 CPP/7zip/Bundles/SFXCon/b/g/7zCon $FLATPAK_DEST/bin/7zCon.sfx
     sources:
       - type: archive
-        url: https://github.com/ip7z/7zip/archive/refs/tags/26.00.tar.gz
-        tag: '26.00'
-        sha256: 07eafed75d661282d402dc2a3edf17e1dbb36fb813f4fbf5a2bad4f6b722aed5
+        url: https://github.com/ip7z/7zip/archive/refs/tags/26.03.tar.gz
+        sha256: 74b11efd8559f9b3dc652e89dc8ebdf4acb66e514a745e44cf75582cdf4512fd
+      - type: shell
+        commands:
+          - find . -name "*.mak" -exec sed -i 's/-Werror//g' {} +
 
   - name: unrar
     no-autogen: true
@@ -72,9 +76,10 @@ modules:
         rm */apps/*.svg
     sources:
       - type: archive
-        url: https://downloads.sourceforge.net/project/mcomix/MComix-3.1.1/mcomix-3.1.1.tar.gz
-        sha256: a10aaaed7bc07deb74efde93bf9a8a27e1bcbf1824a0519b264cfee582becef8
+        url: https://downloads.sourceforge.net/project/mcomix/MComix-3.2.0/mcomix-3.2.0.tar.gz
+        sha256: a332b3e436e2cbcc001e5d8b3579831d562309110c3d14b1012f8ba7fa04e917
         x-checker-data:
+          is-main-source: true
           type: anitya
           project-id: 8886
           stable-only: true
@@ -122,14 +127,14 @@ modules:
             --prefix=${FLATPAK_DEST} "pygobject" --no-build-isolation
         sources:
           - type: file
-            url: https://files.pythonhosted.org/packages/22/d9/1728840a22a4ef8a8f479b9156aa2943cd98c3907accd3849fb0d5f82bfd/pycairo-1.29.0.tar.gz
-            sha256: f3f7fde97325cae80224c09f12564ef58d0d0f655da0e3b040f5807bd5bd3142
+            url: https://files.pythonhosted.org/packages/26/7c/ab4637b028d9ee12280ab9342f28310e613d5ca30c4d72d2aebeaa6a4969/pycairo-1.29.1.tar.gz
+            sha256: 4fbd26b4af24c9787d84cf5448e34eb8dca064b732479aaecd03109520eebd5f
             x-checker-data:
               name: pycairo
               type: pypi
           - type: file
-            url: https://files.pythonhosted.org/packages/d3/a5/68f883df1d8442e3b267cb92105a4b2f0de819bd64ac9981c2d680d3f49f/pygobject-3.54.5.tar.gz
-            sha256: b6656f6348f5245606cf15ea48c384c7f05156c75ead206c1b246c80a22fb585
+            url: https://files.pythonhosted.org/packages/a3/9b/473a5234ec86bce978d3583adc62441c84cc57181c4ea8a8978997c7f0c1/pygobject-3.58.0.tar.gz
+            sha256: 45068697de3ffe46840ca369705f23118b34db4f7deb63f6eff079a6734ddcca
             x-checker-data:
               name: pygobject
               type: pypi
@@ -138,13 +143,13 @@ modules:
         buildsystem: simple
         build-commands:
           - pip3 install --verbose --exists-action=i --no-index --find-links="file://${PWD}"
-            --prefix=${FLATPAK_DEST} "pybind11<=4.0" --no-build-isolation
+            --prefix=${FLATPAK_DEST} "pybind11" --no-build-isolation
         cleanup:
           - '*'
         sources:
           - type: file
-            url: https://files.pythonhosted.org/packages/88/c5/e98d9c51f3d5300d5e40ad9037dd6b3b60736fd02ab68dcc98c96be7592d/pybind11-3.0.2-py3-none-any.whl
-            sha256: f8a6500548919cc33bcd220d5f984688326f574fa97f1107f2f4fdb4c6fb019f
+            url: https://files.pythonhosted.org/packages/33/fd/8762f7ee3e4e4be6d1d846cffb4916dd9bb02b2f800d3603718a0efe494c/pybind11-3.1.0-py3-none-any.whl
+            sha256: b8488090f8acffbcb6b5d6a85571a6827a0a2981ffb75e5a0b27b87c4a6b7dd0
             x-checker-data:
               type: pypi
               name: pybind11
@@ -154,11 +159,11 @@ modules:
         buildsystem: simple
         build-commands:
           - pip3 install --verbose --exists-action=i --no-index --find-links="file://${PWD}"
-            --prefix=${FLATPAK_DEST} "Pillow>=6.0.0" --no-build-isolation
+            --prefix=${FLATPAK_DEST} "Pillow" --no-build-isolation
         sources:
           - type: file
-            url: https://files.pythonhosted.org/packages/1f/42/5c74462b4fd957fcd7b13b04fb3205ff8349236ea74c7c375766d6c82288/pillow-12.1.1.tar.gz
-            sha256: 9ad8fa5937ab05218e2b6a4cff30295ad35afd2f83ac592e68c0d871bb0fdbc4
+            url: https://files.pythonhosted.org/packages/1c/3d/bb7fca845737cf9d7dbde16ed1843984665ff2e0a518f5db43e77ec540b9/pillow-12.3.0.tar.gz
+            sha256: 3b8182a766685eaa002637e28b4ec8d6b18819a0c71f579bf0dbaa5830297cce
             x-checker-data:
               type: pypi
               name: Pillow
@@ -167,12 +172,12 @@ modules:
         buildsystem: simple
         build-commands:
           - pip3 install --verbose --exists-action=i --no-index --find-links="file://${PWD}"
-            --prefix=${FLATPAK_DEST} "chardet>=5.0.0" --no-build-isolation
+            --prefix=${FLATPAK_DEST} "chardet" --no-build-isolation
         sources:
           - type: file
-            url: https://files.pythonhosted.org/packages/f3/0d/f7b6ab21ec75897ed80c17d79b15951a719226b9fababf1e40ea74d69079/chardet-5.2.0.tar.gz
-            sha256: 1b3b6ff479a8c414bc3fa2c0852995695c4a026dcd6d0633b2dd092ca39c1cf7
+            url: https://files.pythonhosted.org/packages/cf/6e/5a0b348fa4cd7847567a28c6e697ccf58391960bfd13a6e7473ee23ca2f2/chardet-7.6.0-py3-none-any.whl
+            sha256: 4076d795897ce45239825956a1334e134322ecc4bfe84dbb12acd5390de0fbc1
             x-checker-data:
               type: pypi
               name: chardet
-
+              packagetype: bdist_wheel

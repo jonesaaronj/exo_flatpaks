@@ -1,10 +1,10 @@
 id: com.retro_exo.wine
-default-branch: stable-25.08
+default-branch: stable-26.08
 sdk: org.freedesktop.Sdk
 runtime: org.freedesktop.Platform
-runtime-version: &runtime-version '25.08'
+runtime-version: &runtime-version '26.08'
 x-gl-version: &gl-version '1.4'
-x-gl-versions: &gl-versions 25.08;25.08-extra;1.4
+x-gl-versions: &gl-versions 26.08;26.08-extra;1.4
 x-gl-merge-dirs: &gl-merge-dirs vulkan/icd.d;glvnd/egl_vendor.d;egl/egl_external_platform.d;OpenCL/vendors;lib/dri;lib/d3d;lib/gbm;vulkan/explicit_layer.d;vulkan/implicit_layer.d;vdpau
 finish-args:
   - --share=ipc
@@ -84,7 +84,7 @@ add-extensions:
 
   org.freedesktop.Platform.codecs_extra.i386:
     directory: lib/i386-linux-gnu/codecs-extra
-    version: 25.08-extra
+    version: 26.08-extra
     autodelete: false
     add-ld-path: lib
 
@@ -140,6 +140,7 @@ modules:
   # Wine dependencies
 
   - name: krb5
+    buildsystem: autotools
     subdir: src
     build-options:
       config-opts:
@@ -156,6 +157,9 @@ modules:
           project-id: 13287
           stable-only: true
           url-template: https://kerberos.org/dist/krb5/${version0}.${version1}/krb5-${version0}.${version1}.${version2}.tar.gz
+      - type: shell
+        commands:
+          - sed -i 's/error=discarded-qualifiers/no-error=discarded-qualifiers/g' src/configure
 
   - name: krb5-32bit
     subdir: src
@@ -384,8 +388,11 @@ modules:
           - ln -s /app/bin/7zz /app/bin/7z
         sources:
           - type: archive
-            url: https://github.com/ip7z/7zip/archive/refs/tags/26.00.tar.gz
-            sha256: 07eafed75d661282d402dc2a3edf17e1dbb36fb813f4fbf5a2bad4f6b722aed5
+            url: https://github.com/ip7z/7zip/archive/refs/tags/26.03.tar.gz
+            sha256: 74b11efd8559f9b3dc652e89dc8ebdf4acb66e514a745e44cf75582cdf4512fd
+          - type: shell
+            commands:
+              - find . -name "*.mak" -exec sed -i 's/-Werror//g' {} +
 
       - name: cabextract
         sources:

@@ -1,9 +1,8 @@
 app-id: com.retro_exo.martypc-0-4-0
 runtime: org.freedesktop.Platform
-runtime-version: '25.08'
+runtime-version: '26.08'
 sdk: org.freedesktop.Sdk
 sdk-extensions:
-  - org.freedesktop.Sdk.Extension.rust-nightly
   - org.freedesktop.Sdk.Extension.llvm22
 command: martypc
 
@@ -18,14 +17,16 @@ finish-args:
   - --env=WINIT_UNIX_BACKEND=x11
 
 modules:
+  - ../../shared/rust-nightly.yaml
+
   - name: martypc
     build-options:
       build-args:
         - --share=network
-      append-path: /usr/lib/sdk/rust-nightly/bin
+      append-path: /app/rust-nightly/bin
       env:
         RUSTFLAGS: "-C linker=cc"
-        LIBCLANG_PATH: /usr/lib/sdk/llvm21/lib
+        LIBCLANG_PATH: "/usr/lib/sdk/llvm22/lib"
 
     buildsystem: simple
     build-commands:

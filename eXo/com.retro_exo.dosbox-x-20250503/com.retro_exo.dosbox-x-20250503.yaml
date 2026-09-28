@@ -1,7 +1,6 @@
----
 app-id: com.retro_exo.dosbox-x-20250503
 runtime: org.freedesktop.Platform
-runtime-version: '25.08'
+runtime-version: "26.08"
 sdk: org.freedesktop.Sdk
 
 command: dosbox-x
@@ -53,10 +52,28 @@ modules:
 
   # Build DOSBox-X SDL2
   - name: dosbox-x
-    buildsystem: autotools
-    config-opts:
-      - --enable-core-inline
-      - --enable-sdl2
+    buildsystem: simple
+    build-commands:
+      # 1. Substitute deprecated avcodec_close with avcodec_free_context passing pointer reference
+      - sed -i 's/avcodec_close(\([^)]*\))/avcodec_free_context(\&\1)/g' src/hardware/hardware.cpp
+
+      # 2. Modernize static key_frame assignments (lines 174, etc.)
+      - sed -i 's/\([^ ]*->\)key_frame\s*=\s*1/\1flags |= AV_FRAME_FLAG_KEY/g' src/hardware/hardware.cpp
+      - sed -i 's/\([^ ]*->\)key_frame\s*=\s*0/\1flags \&= ~AV_FRAME_FLAG_KEY/g' src/hardware/hardware.cpp
+
+      # 3. Fix the conditional ternary assignment on line 1527 (handles nested parentheses)
+      - sed -i 's/\([^ ]*->\)key_frame\s*=\s*\(.*\)\s*?\s*1\s*:\s*0;/if (\2) { \1flags |= AV_FRAME_FLAG_KEY; } else { \1flags \&= ~AV_FRAME_FLAG_KEY; }/g' src/hardware/hardware.cpp
+
+      # 4. Modernize FFmpeg macro definitions for AAC profiles
+      - sed -i 's/FF_PROFILE_AAC_LOW/AV_PROFILE_AAC_LOW/g' src/hardware/hardware.cpp
+
+      # 5. Regenerate build configuration files to properly locate SDL2 in the SDK environment
+      - autoreconf -vfi
+
+      # 6. Standard Autotools sequence matching your configuration options
+      - ./configure --prefix=/app --enable-core-inline --enable-sdl2 --enable-fluidsynth --enable-slirp --enable-alsa
+      - make -j$(nproc)
+      - make install
     sources:
       - type: archive
         url: https://github.com/joncampbell123/dosbox-x/archive/refs/tags/dosbox-x-v2025.05.03.tar.gz
@@ -66,4 +83,3 @@ modules:
       project-id: 242383
       stable-only: true
       tag-template: dosbox-x-v$version
-...

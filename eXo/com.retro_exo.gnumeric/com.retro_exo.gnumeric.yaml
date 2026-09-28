@@ -1,6 +1,6 @@
 id: com.retro_exo.gnumeric
 runtime: org.gnome.Platform
-runtime-version: "50"
+runtime-version: "51"
 sdk: org.gnome.Sdk
 command: gnumeric
 appstream-compose: false
@@ -36,8 +36,8 @@ modules:
       - "*.la"
     sources:
       - type: archive
-        url: https://download.gnome.org/sources/libgsf/1.14/libgsf-1.14.55.tar.xz
-        sha256: 74d60abba15bd3ea5ad17da5b924d8e36f649a25c3dc77adbabd2a3628a02131
+        url: https://download.gnome.org/sources/libgsf/1.14/libgsf-1.14.60.tar.xz
+        sha256: 83e12c36a099a8a7019bf425e2c24af66eeb2ef5874251e694431a07d9805dae
         x-checker-data:
           type: gnome
           name: libgsf
@@ -54,8 +54,8 @@ modules:
       - "*.la"
     sources:
       - type: archive
-        url: https://download.gnome.org/sources/goffice/0.10/goffice-0.10.61.tar.xz
-        sha256: 558597fd9ca59b93ff562750218d1e7ea8ec3c8d0ed6a5cc096aa715ef909a15
+        url: https://download.gnome.org/sources/goffice/0.10/goffice-0.10.62.tar.xz
+        sha256: 500eaff50628faa75adb3cd560236a4db498d9e7c52c036b78fa9a57f21805b3
         x-checker-data:
           type: gnome
           name: goffice
@@ -75,8 +75,8 @@ modules:
       - "*"
     sources:
       - type: archive
-        url: https://mirrors.ibiblio.org/gnu/ed/ed-1.22.5.tar.lz
-        sha256: 56e107ddc2f29dad6690376c15bf9751509e1ee3b8241710e44edbe5c3a158cc
+        url: https://mirrors.ibiblio.org/gnu/ed/ed-1.22.6.tar.lz
+        sha256: 3f33b22135219c39c3c695f7b7171c2567d3e2a17c798c0a90607320cbb268f2
   - name: bc
     cleanup:
       - "*"
@@ -124,8 +124,8 @@ modules:
       - /include
     sources:
       - type: archive
-        url: https://download.gnome.org/sources/gnumeric/1.12/gnumeric-1.12.61.tar.xz
-        sha256: 2ac135d856572713c1a408b76b50a59f2a9769ed21f1213446b5af255df20a12
+        url: https://download.gnome.org/sources/gnumeric/1.12/gnumeric-1.12.62.tar.xz
+        sha256: 89331121321b9bad72d37af5a6d13a0a636f0fbb0880f0ea1f2cf8b7ab9ae631
         x-checker-data:
           type: gnome
           name: gnumeric

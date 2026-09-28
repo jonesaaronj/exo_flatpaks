@@ -1,8 +1,8 @@
 id: com.retro_exo.wine
-default-branch: stable-25.08
+default-branch: stable-26.08
 sdk: org.freedesktop.Sdk
 runtime: org.freedesktop.Platform
-runtime-version: &runtime-version '25.08'
+runtime-version: &runtime-version '26.08'
 command: start-wine
 
 finish-args:

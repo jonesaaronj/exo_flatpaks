@@ -1,3 +1,8 @@
 #!/bin/sh
 
-gh release upload "${1}" ./release_all/*.flatpak  --clobber
+TODAY=$(date +%Y%m%d)
+RELEASE="flatpaks_${TODAY}"
+echo ${RELEASE}
+
+gh release create "${RELEASE}" --title "${RELEASE}" --generate-notes
+gh release upload "${RELEASE}" ./release_all/*.flatpak  --clobber
