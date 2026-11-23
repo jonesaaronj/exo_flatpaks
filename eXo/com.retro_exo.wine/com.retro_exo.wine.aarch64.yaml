@@ -23,6 +23,7 @@ finish-args:
   - --filesystem=host
   - --env=WINEPREFIX=/var/data/wine
   - --env=FONTCONFIG_FILE=/etc/fonts/fonts.conf
+  - --env=WINEDLLOVERRIDES=winemenubuilder.exe=d;winepulse.drv=d;wpcap=d
 
 modules:
   - name: box64
@@ -33,7 +34,7 @@ modules:
     sources:
       - type: git
         url: https://github.com/ptitSeb/box64.git
-        branch: main
+        commit: 52db1d07ac8f198fd0bbef7e28f677116a688f3f  # main, 2026-11-13
       - type: shell
         commands:
           - sed -i 's|DESTINATION /etc|DESTINATION etc|g' CMakeLists.txt
